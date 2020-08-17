@@ -6,7 +6,7 @@
    https://github.com/phpcq/phpcq
 
 -->
-<project name="metamodels/attribute-geoprotection" default="build">
+<project name="metamodels/attribute-levenshtein" default="build">
   <import file="vendor/phpcq/phpcq/phpcq.main.xml" />
   <target name="phpspec" />
 </project>
