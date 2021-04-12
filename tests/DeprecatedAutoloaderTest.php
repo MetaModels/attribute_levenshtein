@@ -12,6 +12,7 @@
  *
  * @package    MetaModels/attribute_levensthein
  * @author     David Molineus <david.molineus@netzmacht.de>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
@@ -21,6 +22,7 @@ namespace MetaModels\AttributeLevenshteinBundle\Test;
 
 use MetaModels\AttributeLevenshteinBundle\Attribute\AttributeLevenshtein;
 use MetaModels\AttributeLevenshteinBundle\Attribute\LevenshteinAttributeTypeFactory;
+use MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\FilterSetting\TypeRendererListener;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -38,7 +40,8 @@ class DeprecatedAutoloaderTest extends TestCase
      */
     private static $classes = [
         'MetaModels\Attribute\Levensthein\AttributeLevensthein'            => AttributeLevenshtein::class,
-        'MetaModels\Attribute\Levensthein\LevenstheinAttributeTypeFactory' => LevenshteinAttributeTypeFactory::class
+        'MetaModels\Attribute\Levensthein\LevenstheinAttributeTypeFactory' => LevenshteinAttributeTypeFactory::class,
+        'MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\FilterSetting\TypeRendererListener' => TypeRendererListener::class
     ];
 
     /**

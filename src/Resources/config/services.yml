@@ -12,8 +12,13 @@ services:
         tags:
           - { name: metamodels.filter_factory }
 
+    # Backward compatibility.
     metamodels.attribute_levenshtein.filter_setting_renderer_listener:
-        class: MetaModels\AttributeLevenshteinBundle\EventListener\LevenshteinFilterSettingTypeRendererListener
+      deprecated: 'This service %alias_id% is deprecated since 2.2.0 and where removed in 3.0.'
+      alias: '@MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\FilterSetting\TypeRendererListener'
+
+    MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\FilterSetting\TypeRendererListener:
+        public: false
         arguments:
           - "@metamodels.filter_setting_factory"
           - "@event_dispatcher"
