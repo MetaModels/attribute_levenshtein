@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levensthein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,7 @@
  *
  * @package    MetaModels/attribute_levensthein
  * @author     David Molineus <david.molineus@netzmacht.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -25,6 +25,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * This class tests if the deprecated autoloader works.
+ *
+ * @covers \MetaModels\AttributeLevenshteinBundle\Attribute\AttributeLevenshtein
+ * @covers \MetaModels\AttributeLevenshteinBundle\Attribute\LevenshteinAttributeTypeFactory
  */
 class DeprecatedAutoloaderTest extends TestCase
 {
@@ -64,11 +67,11 @@ class DeprecatedAutoloaderTest extends TestCase
      */
     public function testDeprecatedClassesAreAliases($oldClass, $newClass)
     {
-        $this->assertTrue(class_exists($oldClass), sprintf('Class text "%s" is not found.', $oldClass));
+        self::assertTrue(class_exists($oldClass), sprintf('Class text "%s" is not found.', $oldClass));
 
         $oldClassReflection = new \ReflectionClass($oldClass);
         $newClassReflection = new \ReflectionClass($newClass);
 
-        $this->assertSame($newClassReflection->getFileName(), $oldClassReflection->getFileName());
+        self::assertSame($newClassReflection->getFileName(), $oldClassReflection->getFileName());
     }
 }

@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levensthein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,8 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -30,6 +31,8 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * This test case test the extension.
+ *
+ * @covers \MetaModels\AttributeLevenshteinBundle\DependencyInjection\MetaModelsAttributeLevenshteinExtension
  */
 class MetaModelsAttributeLevenshteinExtensionTest extends TestCase
 {
@@ -42,8 +45,8 @@ class MetaModelsAttributeLevenshteinExtensionTest extends TestCase
     {
         $extension = new MetaModelsAttributeLevenshteinExtension();
 
-        $this->assertInstanceOf(MetaModelsAttributeLevenshteinExtension::class, $extension);
-        $this->assertInstanceOf(ExtensionInterface::class, $extension);
+        self::assertInstanceOf(MetaModelsAttributeLevenshteinExtension::class, $extension);
+        self::assertInstanceOf(ExtensionInterface::class, $extension);
     }
 
     /**
@@ -56,12 +59,12 @@ class MetaModelsAttributeLevenshteinExtensionTest extends TestCase
         $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
 
         $container
-            ->expects($this->atLeast(2))
+            ->expects(self::atLeast(2))
             ->method('setDefinition')
             ->withConsecutive(
                 [
                     'metamodels.attribute_levenshtein.attribute_factory',
-                    $this->callback(
+                    self::callback(
                         function ($value) {
                             /** @var Definition $value */
                             $this->assertInstanceOf(Definition::class, $value);
@@ -74,7 +77,7 @@ class MetaModelsAttributeLevenshteinExtensionTest extends TestCase
                 ],
                 [
                     'metamodels.attribute_levenshtein.filter_factory',
-                    $this->callback(
+                    self::callback(
                         function ($value) {
                             /** @var Definition $value */
                             $this->assertInstanceOf(Definition::class, $value);
