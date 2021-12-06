@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
  * (c) 2012-2021 The MetaModels team.
  *
@@ -10,12 +10,13 @@
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels/attribute_levensthein
+ * @package    MetaModels/attribute_levenshtein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2012-2021 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -29,6 +30,7 @@ use ContaoCommunityAlliance\DcGeneral\Event\AbstractEnvironmentAwareEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\ActionEvent;
 use Doctrine\DBAL\Connection;
 use MetaModels\IFactory;
+use MetaModels\ITranslatedMetaModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -63,7 +65,7 @@ class RegenerateSearchIndexListener extends AbstractListener
     }
 
     /**
-     * Regenerate the search index when 'rebuild_levensthein' action is called.
+     * Regenerate the search index when 'rebuild_levenshtein' action is called.
      *
      * @param ActionEvent $event The event.
      *
@@ -106,14 +108,29 @@ class RegenerateSearchIndexListener extends AbstractListener
                 ->execute();
         }
 
-        $languageBackup = $GLOBALS['TL_LANGUAGE'];
-        foreach ($metaModel->getAvailableLanguages() as $language) {
-            $GLOBALS['TL_LANGUAGE'] = $language;
-            foreach ($metaModel->findByFilter(null) as $item) {
-                $attribute->modelSaved($item);
+        if ($metaModel instanceof ITranslatedMetaModel) {
+            $languageBackup = $metaModel->getLanguage();
+            foreach ($metaModel->getLanguages() as $language) {
+                $metaModel->selectLanguage($language);
+                $GLOBALS['TL_LANGUAGE'] = $language;
+                foreach ($metaModel->findByFilter(null) as $item) {
+                    $attribute->modelSaved($item);
+                }
             }
+            $metaModel->selectLanguage($languageBackup);
+        } else {
+            $languageBackup = $GLOBALS['TL_LANGUAGE'];
+            $languages = $metaModel->isTranslated(false)
+                ? $metaModel->getAvailableLanguages()
+                : [$languageBackup];
+            foreach ($languages as $language) {
+                $GLOBALS['TL_LANGUAGE'] = $language;
+                foreach ($metaModel->findByFilter(null) as $item) {
+                    $attribute->modelSaved($item);
+                }
+            }
+            $GLOBALS['TL_LANGUAGE'] = $languageBackup;
         }
-        $GLOBALS['TL_LANGUAGE'] = $languageBackup;
 
         $count = $this->connection
             ->createQueryBuilder()
