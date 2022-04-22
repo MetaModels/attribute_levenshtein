@@ -1,89 +1,91 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels/attribute_levensthein
+ * @package    MetaModels/attribute_levenshtein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2022 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 
-use Contao\Database;
-use Contao\Database\Result;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Statement;
 use MetaModels\Attribute\IAttribute;
 use MetaModels\Attribute\ITranslated;
 use Patchwork\Utf8;
 
 /**
- * This class implements an general purpose search index for MetaModels to be searched with LevenstheinSearch algorithm.
+ * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
  */
 class LevenshteinIndexLookup
 {
     /**
-     * The database connection to use.
+     * The database connection.
      *
-     * @var Database
+     * @var Connection
      */
-    private $database;
+    private Connection $connection;
 
     /**
      * The list of valid attributes.
      *
-     * @var IAttribute[]
+     * @var list<IAttribute>
      */
-    private $attributeList;
+    private array $attributeList;
 
     /**
-     * The maximum allowed levensthein distance.
+     * The maximum allowed levenshtein distance.
      *
-     * @var array
+     * @var array<string, int>
      */
-    private $maxDistance;
+    private array $maxDistance;
 
     /**
      * Minimum length of words to be added to the index.
      *
      * @var int
      */
-    private $minLength = 3;
+    private int $minLength = 3;
 
     /**
      * Maximum length of words to be added to the index.
      *
      * @var int
      */
-    private $maxLength = 20;
+    private int $maxLength = 20;
 
     /**
      * Create a new instance.
      *
-     * @param Database     $database      The database instance to use.
-     *
-     * @param IAttribute[] $attributeList The list of valid attributes.
-     *
-     * @param string       $language      The language key.
-     *
-     * @param string       $pattern       The pattern to search.
-     *
-     * @param array        $maxDistance   The maximum allowed levensthein distance.
+     * @param Connection         $connection    The connection instance to use.
+     * @param IAttribute[]       $attributeList The list of valid attributes.
+     * @param string             $language      The language key.
+     * @param string             $pattern       The pattern to search.
+     * @param array<string, int> $maxDistance   The maximum allowed levenshtein distance.
      *
      * @return string[]
      */
-    public static function filter(Database $database, $attributeList, $language, $pattern, $maxDistance = array(0 => 2))
-    {
-        $instance = new static($database, $attributeList, $maxDistance);
+    public static function filter(
+        Connection $connection,
+        array $attributeList,
+        string $language,
+        string $pattern,
+        array $maxDistance = [0 => 2]
+    ): array {
+        $instance = new static($connection, $attributeList, $maxDistance);
 
         return $instance->search($language, $pattern);
     }
@@ -91,29 +93,26 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Database     $database      The database instance to use.
-     *
+     * @param Connection   $connection    The database connection.
      * @param IAttribute[] $attributeList The list of valid attributes.
-     *
-     * @param int[]        $maxDistance   The maximum allowed levensthein distance.
+     * @param int[]        $maxDistance   The maximum allowed levenshtein distance.
      */
-    public function __construct(Database $database, $attributeList, $maxDistance = array(0 => 2))
+    public function __construct(Connection $connection, array $attributeList, array $maxDistance = [0 => 2])
     {
-        $this->database      = $database;
+        $this->connection    = $connection;
         $this->attributeList = $attributeList;
         $this->maxDistance   = $maxDistance;
     }
 
     /**
-     * Search for occurences and return the ids of matching items.
+     * Search for occurrences and return the ids of matching items.
      *
      * @param string $language The language key.
-     *
      * @param string $pattern  The pattern to search.
      *
      * @return string[]
      */
-    public function search($language, $pattern)
+    public function search(string $language, string $pattern): array
     {
         return $this->searchInternal($language, new SearchStringParser($pattern));
     }
@@ -122,80 +121,77 @@ class LevenshteinIndexLookup
      * Compile a list of best matching suggestions of words for all items that have been returned by the search.
      *
      * @param string $language The language key.
-     *
      * @param string $pattern  The pattern to search.
      *
      * @return string[]
      */
-    public function getSuggestions($language, $pattern)
+    public function getSuggestions(string $language, string $pattern): array
     {
         // Chop off the last word as it is the beginning of a new word.
         $parser    = new SearchStringParser($pattern, true);
         $items     = $this->searchInternal($language, $parser);
-        $procedure = array();
-        $params    = array();
+        $procedure = [];
+        $params    = [];
         $partial   = $parser->getPartial();
 
-        if (in_array($partial[0], array('+', '-', '""'))) {
-            $partial = substr($partial, 1);
+        if (\in_array($partial[0], ['+', '-', '""'])) {
+            $partial = \substr($partial, 1);
         }
 
         if (!empty($items)) {
-            $procedure[] = sprintf(
+            $procedure[] = \sprintf(
                 'tl_metamodel_levensthein.item IN (%1$s)',
-                implode(',', array_fill(0, count($items), '?'))
+                \implode(',', \array_fill(0, \count($items), '?'))
             );
-            $params      = array_merge($params, $items);
+            $params      = \array_merge($params, $items);
         }
 
-        $attributeIds = array();
+        $attributeIds = [];
         foreach ($this->attributeList as $attribute) {
             $attributeIds[] = $attribute->get('id');
         }
 
         $procedure[] = '(tl_metamodel_levensthein_index.language=?)';
-        $procedure[] = sprintf(
+        $procedure[] = \sprintf(
             '(tl_metamodel_levensthein_index.attribute IN (%1$s))',
-            implode(',', array_fill(0, count($attributeIds), '?'))
+            \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
-        $procedure[] = '(word LIKE ?)';
-        $params      = array_merge(
+        $procedure[] = '(tl_metamodel_levensthein_index.word LIKE ?)';
+        $params      = \array_merge(
             $params,
-            array($language),
+            [$language],
             $attributeIds,
-            array($partial . '%'),
+            [$partial . '%'],
             $attributeIds
         );
-        $query       = sprintf(
+        $query       = \sprintf(
             'SELECT DISTINCT word ' .
             'FROM tl_metamodel_levensthein_index ' .
             'LEFT JOIN tl_metamodel_levensthein ON (tl_metamodel_levensthein.id=tl_metamodel_levensthein_index.pid)' .
-            'WHERE ' . implode(' AND ', $procedure) .
-            'ORDER BY FIELD(tl_metamodel_levensthein_index.attribute,%1$s),word',
-            implode(',', array_fill(0, count($attributeIds), '?'))
+            'WHERE ' . \implode(' AND ', $procedure) .
+            'ORDER BY FIELD(tl_metamodel_levensthein_index.attribute,%1$s),tl_metamodel_levensthein_index.word',
+            \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
 
-        $result = $this->database
-            ->prepare($query)
-            ->execute($params);
+        $result = $this->connection->prepare($query);
+        $result->execute($params);
 
-        return $result->fetchEach('word');
+        return $result->fetchFirstColumn();
     }
 
     /**
      * Search using the given search parser.
      *
      * @param string             $language The language key.
-     *
      * @param SearchStringParser $parser   The parser to use.
      *
      * @return string[]|null
      */
-    private function searchInternal($language, $parser)
+    private function searchInternal(string $language, SearchStringParser $parser): ?array
     {
         $results = new ResultSet();
 
-        $attributeIds = array();
+        $attributeIds = [];
         foreach ($this->attributeList as $attribute) {
             $attributeIds[] = $attribute->get('id');
         }
@@ -212,36 +208,34 @@ class LevenshteinIndexLookup
                 $results->addResults('-all-', $attribute, $ids);
             }
         }
-        $items = array_filter($results->getCombinedResults($this->attributeList));
+        $items = \array_filter($results->getCombinedResults($this->attributeList));
 
         if ($items) {
             return $items;
         }
 
-        // Try via levensthein now.
-        $this->getLevenstheinCandidates($attributeIds, $parser, $results);
+        // Try via levenshtein now.
+        $this->getLevenshteinCandidates($attributeIds, $parser, $results);
 
-        return array_filter($results->getCombinedResults($this->attributeList));
+        return \array_filter($results->getCombinedResults($this->attributeList));
     }
 
     /**
      * Retrieve the items matching the literal search patterns.
      *
      * @param string             $language  The language key.
-     *
      * @param SearchStringParser $parser    The parser to use.
-     *
      * @param ResultSet          $resultSet The result set to add to.
      *
      * @return void
      */
-    private function getLiteralMatches($language, SearchStringParser $parser, ResultSet $resultSet)
+    private function getLiteralMatches(string $language, SearchStringParser $parser, ResultSet $resultSet)
     {
         $literals = $parser->getLiterals();
         foreach ($literals as $literal) {
             foreach ($this->attributeList as $attribute) {
                 if ($attribute instanceof ITranslated) {
-                    $results = $attribute->searchForInLanguages('*' . $literal . '*', array($language));
+                    $results = $attribute->searchForInLanguages('*' . $literal . '*', [$language]);
                 } else {
                     $results = $attribute->searchFor('*' . $literal . '*');
                 }
@@ -254,7 +248,7 @@ class LevenshteinIndexLookup
                 $resultSet->addResults(
                     '"' . $literal . '"',
                     $attribute,
-                    $results ?: array()
+                    $results ?: []
                 );
             }
         }
@@ -263,60 +257,63 @@ class LevenshteinIndexLookup
     /**
      * Find exact matches of chunks and return the parent ids.
      *
-     * @param string[]           $attributeIds The attributes to search on.
-     *
+     * @param list<string>       $attributeIds The attributes to search on.
      * @param string             $language     The language key.
-     *
      * @param SearchStringParser $parser       The chunks to search for.
-     *
      * @param ResultSet          $resultSet    The result set to add to.
      *
      * @return void
      */
-    private function getMatchingKeywords($attributeIds, $language, $parser, ResultSet $resultSet)
-    {
-        if ($parser->getKeywords() == array()) {
+    private function getMatchingKeywords(
+        array $attributeIds,
+        string $language,
+        SearchStringParser $parser,
+        ResultSet $resultSet
+    ): void {
+        if ($parser->getKeywords() == []) {
             return;
         }
 
         foreach ($parser->getKeywords() as $word) {
-            $searchWord = str_replace(
-                array('*', '?'),
-                array('%', '_'),
-                str_replace(
-                    array('%', '_'),
-                    array('\%', '\_'),
-                    $word
-                )
-            ) . '%';
+            $searchWord = \str_replace(
+                              ['*', '?'],
+                              ['%', '_'],
+                              \str_replace(
+                                  ['%', '_'],
+                                  ['\%', '\_'],
+                                  $word
+                              )
+                          ) . '%';
 
-            $parameters   = array_merge(array($language), $attributeIds);
+            $parameters   = \array_merge([$language], $attributeIds);
             $parameters[] = $this->normalizeWord($searchWord);
             $parameters[] = $searchWord;
-            $parameters   = array_merge($parameters, $attributeIds);
-            $query        = sprintf(
-                'SELECT attribute,item FROM tl_metamodel_levensthein WHERE id IN (SELECT pid
-                FROM tl_metamodel_levensthein_index
-                WHERE language=?
-                AND attribute IN (%1$s)
-                AND (transliterated LIKE ? OR word LIKE ?)
-                ) ORDER BY FIELD(attribute,%1$s)',
-                implode(',', array_fill(0, count($attributeIds), '?'))
+            $parameters   = \array_merge($parameters, $attributeIds);
+            $query        = \sprintf(
+                'SELECT t.attribute,t.item FROM tl_metamodel_levensthein AS t
+                            WHERE t.id IN (SELECT tx.pid
+                            FROM tl_metamodel_levensthein_index AS tx
+                            WHERE tx.language=?
+                            AND tx.attribute IN (%1$s)
+                            AND (tx.transliterated LIKE ? OR tx.word LIKE ?)
+                            ) ORDER BY FIELD(t.attribute,%1$s)',
+                \implode(',', \array_fill(0, \count($attributeIds), '?'))
             );
 
-            $query = $this->database
-                ->prepare($query)
-                ->execute($parameters);
+            $query = $this
+                ->connection
+                ->prepare($query);
+            $query->execute($parameters);
 
-            if (!$query->numRows) {
+            if ($query->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
                     $resultSet->addResult($word, $attribute, 0);
                 }
             }
 
-            while ($query->next()) {
-                if (!empty($query->attribute) && !empty($query->item)) {
-                    $resultSet->addResult($word, $query->attribute, $query->item);
+            while ($result = $query->fetchAssociative()) {
+                if (!empty($result['attribute']) && !empty($result['item'])) {
+                    $resultSet->addResult($word, $result['attribute'], $result['item']);
                 }
             }
         }
@@ -325,24 +322,25 @@ class LevenshteinIndexLookup
     /**
      * Find exact matches of chunks and return the parent ids.
      *
-     * @param string[]           $attributeIds The attributes to search on.
-     *
+     * @param list<string>       $attributeIds The attributes to search on.
      * @param string             $language     The language key.
-     *
      * @param SearchStringParser $parser       The chunks to search for.
-     *
      * @param ResultSet          $resultSet    The result set to add to.
      *
      * @return void
      */
-    private function getMustIds($attributeIds, $language, $parser, ResultSet $resultSet)
-    {
-        if (($must = $parser->getMust()) === array()) {
+    private function getMustIds(
+        array $attributeIds,
+        string $language,
+        SearchStringParser $parser,
+        ResultSet $resultSet
+    ): void {
+        if (($must = $parser->getMust()) === []) {
             return;
         }
 
-        $parameters = array_merge(array($language), $attributeIds);
-        $attributes = implode(',', array_fill(0, count($attributeIds), '?'));
+        $parameters = \array_merge([$language], $attributeIds);
+        $attributes = \implode(',', \array_fill(0, \count($attributeIds), '?'));
         $sql        = sprintf(
             'SELECT attribute,item FROM tl_metamodel_levensthein WHERE id IN (
                 SELECT pid
@@ -357,21 +355,20 @@ class LevenshteinIndexLookup
         );
 
         foreach ($must as $word) {
-            $query = $this->database
-                ->prepare($sql)
-                ->execute(array_merge($parameters, array($this->normalizeWord($word), $word), $attributeIds));
+            $query = $this->connection->prepare($sql);
+            $query->execute(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
 
             // If no matches, add an empty array.
-            if ($query->numRows === 0) {
+            if ($query->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
-                    $resultSet->addMustResult($word, $attribute, array());
+                    $resultSet->addMustResult($word, $attribute, 0);
                 }
                 continue;
             }
 
-            while ($query->next()) {
-                if (!empty($query->attribute) && !empty($query->item)) {
-                    $resultSet->addMustResult($word, $query->attribute, $query->item);
+            while ($row = $query->fetchAssociative()) {
+                if (!empty($row['attribute']) && !empty($row['item'])) {
+                    $resultSet->addMustResult($word, $row['attribute'], $row['item']);
                 }
             }
         }
@@ -380,74 +377,76 @@ class LevenshteinIndexLookup
     /**
      * Find exact matches of chunks and return the parent ids.
      *
-     * @param string[]           $attributeIds The attributes to search on.
-     *
+     * @param list<string>       $attributeIds The attributes to search on.
      * @param string             $language     The language key.
-     *
      * @param SearchStringParser $parser       The chunks to search for.
-     *
      * @param ResultSet          $resultSet    The result set to add to.
      *
      * @return void
      */
-    private function getMustNotIds($attributeIds, $language, $parser, ResultSet $resultSet)
-    {
-        if (($must = $parser->getMustNot()) === array()) {
+    private function getMustNotIds(
+        array $attributeIds,
+        string $language,
+        SearchStringParser $parser,
+        ResultSet $resultSet
+    ): void {
+        if (($must = $parser->getMustNot()) === []) {
             return;
         }
 
-        $parameters = array_merge(array($language), $attributeIds);
-        $attributes = implode(',', array_fill(0, count($attributeIds), '?'));
-        $sql        = sprintf(
-            'SELECT attribute,item FROM tl_metamodel_levensthein WHERE id IN (
-                SELECT pid
-                    FROM tl_metamodel_levensthein_index
-                    WHERE language=?
-                    AND attribute IN (%1$s)
-                    AND (%2$s)
-                    ORDER BY FIELD(attribute,%1$s),word
-            )',
+        $parameters = \array_merge([$language], $attributeIds);
+        $attributes = \implode(',', \array_fill(0, \count($attributeIds), '?'));
+        $sql        = \sprintf(
+            'SELECT l.attribute, l.item FROM tl_metamodel_levensthein AS l
+                WHERE l.id IN (
+                    SELECT lx.pid
+                        FROM tl_metamodel_levensthein_index AS lx
+                        WHERE lx.language=?
+                        AND lx.attribute IN (%1$s)
+                        AND (%2$s)
+                        ORDER BY FIELD(lx.attribute,%1$s),lx.word
+                    )',
             $attributes,
-            'transliterated=? OR word=?'
+            'lx.transliterated=? OR lx.word=?'
         );
 
         foreach ($must as $word) {
-            $query = $this->database
-                ->prepare($sql)
-                ->execute(array_merge($parameters, array($this->normalizeWord($word), $word), $attributeIds));
+            $query = $this->connection->prepare($sql);
+            $query->execute(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
 
-            while ($query->next()) {
-                if (!empty($query->attribute) && !empty($query->item)) {
-                    $resultSet->addNegativeResult($word, $query->attribute, $query->item);
+            while ($row = $query->fetchAssociative()) {
+                if (!empty($row['attribute']) && !empty($row['item'])) {
+                    $resultSet->addNegativeResult($word, $row['attribute'], $row['item']);
                 }
             }
         }
     }
 
     /**
-     * Retrieve all words from the search index valid as levensthein candidates.
+     * Retrieve all words from the search index valid as levenshtein candidates.
      *
-     * @param string[]           $attributeIds The ids of the attributes to query.
-     *
+     * @param list<string>       $attributeIds The ids of the attributes to query.
      * @param SearchStringParser $parser       The chunks to search for.
-     *
      * @param ResultSet          $resultSet    The result set to add to.
      *
      * @return void
      */
-    private function getLevenstheinCandidates($attributeIds, $parser, ResultSet $resultSet)
-    {
+    private function getLevenshteinCandidates(
+        array $attributeIds,
+        SearchStringParser $parser,
+        ResultSet $resultSet
+    ): void {
         $words = $parser->getKeywords($this->minLength, $this->maxLength);
-        $query = sprintf(
+        $query = \sprintf(
             'SELECT li.transliterated, li.word, li.pid, li.attribute, l.item
                 FROM tl_metamodel_levensthein_index AS li
                 RIGHT JOIN tl_metamodel_levensthein AS l ON (l.id=li.pid)
                 WHERE
                 li.attribute IN (%1$s)
-                AND LENGTH(transliterated) BETWEEN ? AND ?
-                ORDER BY word
+                AND LENGTH(li.transliterated) BETWEEN ? AND ?
+                ORDER BY li.word
                 ',
-            implode(',', array_fill(0, count($attributeIds), '?'))
+            \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
 
         foreach ($words as $chunk) {
@@ -456,19 +455,18 @@ class LevenshteinIndexLookup
             }
 
             $transChunk = $this->normalizeWord($chunk);
-            $wordlength = strlen($transChunk);
+            $wordLength = \strlen($transChunk);
             $distance   = $this->getAllowedDistanceFor($transChunk);
-            $minLen     = ($wordlength - $distance);
-            $maxLen     = ($wordlength + $distance);
+            $minLen     = ($wordLength - $distance);
+            $maxLen     = ($wordLength + $distance);
 
             // Easy out, word is too short or too long.
-            if (($wordlength < $this->minLength) || ($wordlength > $this->maxLength)) {
+            if (($wordLength < $this->minLength) || ($wordLength > $this->maxLength)) {
                 continue;
             }
 
-            $results = $this->database
-                ->prepare($query)
-                ->execute(array_merge($attributeIds, array($minLen, $maxLen)));
+            $results = $this->connection->prepare($query);
+            $results->execute(\array_merge($attributeIds, [$minLen, $maxLen]));
 
             $this->processCandidates($resultSet, $chunk, $results, $distance);
         }
@@ -479,23 +477,23 @@ class LevenshteinIndexLookup
      *
      * @param ResultSet $resultSet The result list to add to.
      * @param string    $chunk     The chunk being processed.
-     * @param Result    $results   The results to process.
+     * @param Statement $results   The results to process.
      * @param int       $distance  The acceptable distance.
      *
      * @return void
      */
-    private function processCandidates(ResultSet $resultSet, $chunk, Result $results, $distance)
+    private function processCandidates(ResultSet $resultSet, string $chunk, Statement $results, int $distance): void
     {
-        while ($results->next()) {
-            if (empty($results->attribute) || empty($results->item)) {
+        while ($result = $results->fetchAssociative()) {
+            if (empty($result['attribute']) || empty($result['item'])) {
                 continue;
             }
 
-            if (!empty($results->transliterated)) {
-                $trans = $results->transliterated;
+            if (!empty($result['transliterated'])) {
+                $trans = $result['transliterated'];
 
                 if ($this->isAcceptableByLevenshtein($chunk, $trans, $distance)) {
-                    $resultSet->addResult($chunk, $results->attribute, $results->item);
+                    $resultSet->addResult($chunk, $result['attribute'], $result['item']);
                 }
             }
         }
@@ -508,9 +506,9 @@ class LevenshteinIndexLookup
      *
      * @return int
      */
-    private function getAllowedDistanceFor($word)
+    private function getAllowedDistanceFor(string $word): int
     {
-        $length   = strlen($word);
+        $length   = \strlen($word);
         $distance = 0;
 
         foreach ($this->maxDistance as $minimumLength => $allowedDistance) {
@@ -528,24 +526,22 @@ class LevenshteinIndexLookup
      * Check if the passed value is an acceptable entry.
      *
      * @param string $chunk    Transliterated version of the chunk being searched.
-     *
      * @param string $trans    Transliterated version of the matched entry.
-     *
-     * @param int    $distance The maximum levensthein distance allowed.
+     * @param int    $distance The maximum levenshtein distance allowed.
      *
      * @return bool
      */
-    private function isAcceptableByLevenshtein($chunk, $trans, $distance)
+    private function isAcceptableByLevenshtein(string $chunk, string $trans, int $distance): bool
     {
         // Length too short.
-        if (strlen($trans) <= $this->minLength) {
+        if (\strlen($trans) <= $this->minLength) {
             return false;
         }
         // Result has different Type (Prevent matches like XX = 01).
-        if (is_numeric($trans) && !is_numeric($chunk)) {
+        if (\is_numeric($trans) && !\is_numeric($chunk)) {
             return false;
         }
-        $lev = levenshtein($chunk, $trans);
+        $lev = \levenshtein($chunk, $trans);
         if (0 === $lev) {
             return true;
         }
@@ -564,9 +560,9 @@ class LevenshteinIndexLookup
      *
      * @return string
      */
-    private function normalizeWord($word)
+    private function normalizeWord(string $word): string
     {
-        if (mb_detect_encoding($word) == 'ASCII') {
+        if (\mb_detect_encoding($word) == 'ASCII') {
             return $word;
         }
 

@@ -1,20 +1,21 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels/attribute_levensthein
+ * @package    MetaModels/attribute_levenshtein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2022 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -23,6 +24,7 @@ namespace MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\At
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\AbstractEnvironmentAwareEvent;
+use MetaModels\Attribute\IInternal;
 
 /**
  * This provides the attribute name options.
@@ -58,16 +60,23 @@ class AttributeOptionsListener extends AbstractListener
 
         $result = [];
 
-        // Fetch all attributes except for the current attribute.
+        // Fetch all attributes except for the current attribute and same type.
         foreach ($metaModel->getAttributes() as $attribute) {
-            if ($attribute->get('id') === $model->getId()) {
+            if ($attribute->get('id') === $model->getId()
+                || $attribute->get('type') === $model->getProperty('type')) {
                 continue;
             }
 
-            $result[$attribute->getColName()] = sprintf(
-                '%s [%s]',
+            // Hide virtual types.
+            if ($attribute instanceof IInternal) {
+                continue;
+            }
+
+            $result[$attribute->getColName()] = \sprintf(
+                '%s [%s, "%s"]',
                 $attribute->getName(),
-                $attribute->get('type')
+                $attribute->get('type'),
+                $attribute->getColName()
             );
         }
 
@@ -81,7 +90,7 @@ class AttributeOptionsListener extends AbstractListener
      *
      * @return bool
      */
-    protected function wantToHandle(AbstractEnvironmentAwareEvent $event)
+    protected function wantToHandle(AbstractEnvironmentAwareEvent $event): bool
     {
         /** @var GetPropertyOptionsEvent $event */
         $input = $event->getEnvironment()->getInputProvider();
