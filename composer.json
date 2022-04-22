@@ -9,13 +9,13 @@
     "filter"
   ],
   "type": "contao-bundle",
-  "homepage": "http://now.metamodel.me/",
+  "homepage": "https://now.metamodel.me/",
   "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Christian Schiffler",
       "email": "c.schiffler@cyberspectrum.de",
-      "homepage": "http://www.cyberspectrum.de",
+      "homepage": "https://www.cyberspectrum.de",
       "role": "Developer"
     },
     {
@@ -27,7 +27,7 @@
   "support": {
     "email": "mail@metamodel.me",
     "issues": "https://github.com/MetaModels/attribute_levensthein/issues",
-    "wiki": "http://de.contaowiki.org/MetaModels",
+    "wiki": "https://de.contaowiki.org/MetaModels",
     "irc": "irc://irc.freenode.org/contao.mm",
     "source": "https://github.com/MetaModels/attribute_levensthein"
   },
