@@ -60,9 +60,10 @@ class AttributeOptionsListener extends AbstractListener
 
         $result = [];
 
-        // Fetch all attributes except for the current attribute.
+        // Fetch all attributes except for the current attribute and same type.
         foreach ($metaModel->getAttributes() as $attribute) {
-            if ($attribute->get('id') === $model->getId()) {
+            if ($attribute->get('id') === $model->getId()
+            || $attribute->get('type') === $model->getProperty('type')) {
                 continue;
             }
 
