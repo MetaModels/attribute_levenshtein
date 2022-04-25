@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,7 @@
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2021 The MetaModels team.
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -43,7 +43,7 @@ class RegenerateSearchIndexListener extends AbstractListener
      *
      * @var EventDispatcherInterface
      */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     /**
      * Create a new instance.
@@ -86,24 +86,25 @@ class RegenerateSearchIndexListener extends AbstractListener
 
         $entries = $this->connection
             ->createQueryBuilder()
-            ->select('id')
-            ->from('tl_metamodel_levensthein')
-            ->where('metamodel=:metamodel')
+            ->select('t.id')
+            ->from('tl_metamodel_levensthein', 't')
+            ->where('t.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
             ->execute()
             ->fetchAll(\PDO::FETCH_COLUMN);
 
         $this->connection
             ->createQueryBuilder()
-            ->delete('tl_metamodel_levensthein')
-            ->where('metamodel=:metamodel')
+            ->delete('tl_metamodel_levensthein', 't')
+            ->where('t.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
             ->execute();
+
         if (!empty($entries)) {
             $this->connection
                 ->createQueryBuilder()
-                ->delete('tl_metamodel_levensthein_index')
-                ->where('pid IN(:pids)')
+                ->delete('tl_metamodel_levensthein_index', 't')
+                ->where('t.pid IN(:pids)')
                 ->setParameter('pids', $entries, Connection::PARAM_STR_ARRAY)
                 ->execute();
         }
@@ -134,9 +135,9 @@ class RegenerateSearchIndexListener extends AbstractListener
 
         $count = $this->connection
             ->createQueryBuilder()
-            ->select('COUNT(DISTINCT word)')
-            ->from('tl_metamodel_levensthein_index')
-            ->where('pid IN (SELECT id FROM tl_metamodel_levensthein WHERE metamodel=:metamodel)')
+            ->select('COUNT(DISTINCT tx.word)')
+            ->from('tl_metamodel_levensthein_index', 'tx')
+            ->where('tx.pid IN (SELECT t.id FROM tl_metamodel_levensthein AS t WHERE t.metamodel=:metamodel)')
             ->setParameter('metamodel', $metaModel->get('id'))
             ->execute()
             ->fetch(\PDO::FETCH_COLUMN);
@@ -145,13 +146,12 @@ class RegenerateSearchIndexListener extends AbstractListener
         $this->dispatcher->dispatch($refererEvent, ContaoEvents::SYSTEM_GET_REFERRER);
 
         $event->setResponse(
-            sprintf(
-                '<div id="tl_buttons">
-    <a href="%1$s" class="header_back" title="%2$s" accesskey="b" onclick="Backend.getScrollOffset();">
-        %2$s
-    </a>
+            \sprintf(
+                '
+<div id="tl_buttons">
+    <a href="%1$s" class="header_back" title="%2$s" accesskey="b" onclick="Backend.getScrollOffset();">%2$s</a>
 </div>
-<div class="tl_listing_container levensthein_reindex">
+<div class="tl_listing_container levenshtein_reindex">
             The search index now contains %3$d words.
 </div>
 ',
@@ -169,7 +169,7 @@ class RegenerateSearchIndexListener extends AbstractListener
      *
      * @return bool
      */
-    protected function wantToHandle(AbstractEnvironmentAwareEvent $event)
+    protected function wantToHandle(AbstractEnvironmentAwareEvent $event): bool
     {
         /** @var ActionEvent $event */
         return parent::wantToHandle($event)
