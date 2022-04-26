@@ -64,7 +64,7 @@ class LevenshteinIndex
         $words     = $converter->process($text);
         $entry     = $this->lookUpEntry($attribute, $itemId, $language);
 
-        if (false === $entry) {
+        if (!count($entry)) {
             $entry = $this->createEntry($attribute, $itemId, $language, $words->checksum());
         } elseif ($words->checksum() === $entry['checksum']) {
             return;
@@ -84,10 +84,10 @@ class LevenshteinIndex
      */
     private function lookUpEntry(IAttribute $attribute, string $itemId, string $language): array
     {
-        return $this
+        $entries = $this
             ->connection
             ->createQueryBuilder()
-            ->select('*')
+            ->select('t.*')
             ->from('tl_metamodel_levensthein', 't')
             ->where('t.metamodel=:metamodel')
             ->andWhere('t.attribute=:attribute')
@@ -97,12 +97,19 @@ class LevenshteinIndex
             ->setParameter('attribute', $attribute->get('id'))
             ->setParameter('item', $itemId)
             ->setParameter('language', $language)
+            ->setMaxResults(1)
             ->execute()
             ->fetchAllAssociative();
+
+        if (count($entries)) {
+            return $entries[0];
+        }
+
+        return $entries;
     }
 
     /**
-     * Look up an entry in the database.
+     * Create an entry in the database.
      *
      * @param IAttribute $attribute The attribute.
      * @param string     $itemId    The item id.
@@ -146,8 +153,8 @@ class LevenshteinIndex
         $this
             ->connection
             ->createQueryBuilder()
-            ->delete('tl_metamodel_levensthein_index', 't')
-            ->where('t.pid=:pid')
+            ->delete('tl_metamodel_levensthein_index')
+            ->where('tl_metamodel_levensthein_index.pid=:pid')
             ->setParameter('pid', $entry['id'])
             ->execute();
 

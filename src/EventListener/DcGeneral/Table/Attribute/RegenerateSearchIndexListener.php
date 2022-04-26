@@ -95,16 +95,16 @@ class RegenerateSearchIndexListener extends AbstractListener
 
         $this->connection
             ->createQueryBuilder()
-            ->delete('tl_metamodel_levensthein', 't')
-            ->where('t.metamodel=:metamodel')
+            ->delete('tl_metamodel_levensthein')
+            ->where('tl_metamodel_levensthein.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
             ->execute();
 
         if (!empty($entries)) {
             $this->connection
                 ->createQueryBuilder()
-                ->delete('tl_metamodel_levensthein_index', 't')
-                ->where('t.pid IN(:pids)')
+                ->delete('tl_metamodel_levensthein_index')
+                ->where('tl_metamodel_levensthein_index.pid IN(:pids)')
                 ->setParameter('pids', $entries, Connection::PARAM_STR_ARRAY)
                 ->execute();
         }

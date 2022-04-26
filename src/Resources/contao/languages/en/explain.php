@@ -37,4 +37,6 @@ $GLOBALS['TL_LANG']['XPL']['levenshtein_distance'][1][1] =
 <tr><td style="text-align:center;">5</td><td style="text-align:center;">2</td></tr>
 <tr><td style="text-align:center;">9</td><td style="text-align:center;">3</td></tr>
 </table><br /><br />
+The minimum word length should be between the minimum and maximum of the length of
+the indexed words.<br /><br />
 Configure the values for the distance in ascending order.';
