@@ -261,7 +261,9 @@ class AttributeLevenshtein extends BaseComplex
             $this->indexLookup = new LevenshteinIndexLookup(
                 $this->connection,
                 $this->getIndexedAttributes(),
-                $this->get('levensthein_distance')
+                (array) $this->get('levensthein_distance'),
+                (int) $this->get('levenshtein_minLengthWords'),
+                (int) $this->get('levenshtein_maxLengthWords')
             );
         }
 

@@ -58,14 +58,14 @@ class LevenshteinIndexLookup
      *
      * @var int
      */
-    private int $minLength = 3;
+    private int $minLength;
 
     /**
      * Maximum length of words to be added to the index.
      *
      * @var int
      */
-    private int $maxLength = 20;
+    private int $maxLength;
 
     /**
      * Create a new instance.
@@ -75,6 +75,8 @@ class LevenshteinIndexLookup
      * @param string             $language      The language key.
      * @param string             $pattern       The pattern to search.
      * @param array<string, int> $maxDistance   The maximum allowed levenshtein distance.
+     * @param int                $minLength     The minimum length of words.
+     * @param int                $maxLength     The maximum length of words.
      *
      * @return string[]
      */
@@ -83,9 +85,11 @@ class LevenshteinIndexLookup
         array $attributeList,
         string $language,
         string $pattern,
-        array $maxDistance = [0 => 2]
+        array $maxDistance = [0 => 2],
+        int $minLength = 3,
+        int $maxLength = 20
     ): array {
-        $instance = new static($connection, $attributeList, $maxDistance);
+        $instance = new static($connection, $attributeList, $maxDistance, $minLength, $maxLength);
 
         return $instance->search($language, $pattern);
     }
@@ -96,12 +100,21 @@ class LevenshteinIndexLookup
      * @param Connection   $connection    The database connection.
      * @param IAttribute[] $attributeList The list of valid attributes.
      * @param int[]        $maxDistance   The maximum allowed levenshtein distance.
+     * @param int          $minLength     The minimum length of words.
+     * @param int          $maxLength     The maximum length of words.
      */
-    public function __construct(Connection $connection, array $attributeList, array $maxDistance = [0 => 2])
-    {
+    public function __construct(
+        Connection $connection,
+        array $attributeList,
+        array $maxDistance = [0 => 2],
+        int $minLength = 3,
+        int $maxLength = 20
+    ) {
         $this->connection    = $connection;
         $this->attributeList = $attributeList;
         $this->maxDistance   = $maxDistance;
+        $this->minLength     = $minLength;
+        $this->maxLength     = $maxLength;
     }
 
     /**
@@ -165,7 +178,7 @@ class LevenshteinIndexLookup
             $attributeIds
         );
         $query       = \sprintf(
-            'SELECT DISTINCT word ' .
+            'SELECT DISTINCT tl_metamodel_levensthein_index.word ' .
             'FROM tl_metamodel_levensthein_index ' .
             'LEFT JOIN tl_metamodel_levensthein ON (tl_metamodel_levensthein.id=tl_metamodel_levensthein_index.pid)' .
             'WHERE ' . \implode(' AND ', $procedure) .

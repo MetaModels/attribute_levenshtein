@@ -23,6 +23,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['levensthein extend
     '+advanced' => [
         '-isvariant',
         '-isunique',
+        'levenshtein_minLengthWords',
+        'levenshtein_maxLengthWords',
         'levensthein_distance',
         'levensthein_attributes'
     ],
@@ -74,4 +76,28 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['list']['operations']['rebuild_leve
     'label' => $GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein'],
     'href'  => 'act=rebuild_levensthein',
     'icon'  => 'bundles/metamodelsattributelevenshtein/levensthein.png'
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_minLengthWords'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_minLengthWords'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'default'   => '3',
+    'eval'      => [
+        'rgxp'     => 'digit',
+        'tl_class' => 'clr w50',
+    ],
+    'sql'       => "varchar(2) NOT NULL default '3'"
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_maxLengthWords'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_maxLengthWords'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'default'   => '20',
+    'eval'      => [
+        'rgxp'     => 'digit',
+        'tl_class' => 'w50',
+    ],
+    'sql'       => "varchar(3) NOT NULL default '20'"
 ];
