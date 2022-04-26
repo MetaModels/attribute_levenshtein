@@ -88,7 +88,15 @@ class AttributeLevenshtein extends BaseComplex
      */
     public function getAttributeSettingNames()
     {
-        return \array_merge(parent::getAttributeSettingNames(), ['levensthein_distance', 'levensthein_attributes']);
+        return \array_merge(
+            parent::getAttributeSettingNames(),
+            [
+                'levensthein_distance',
+                'levensthein_attributes',
+                'levenshtein_minLengthWords',
+                'levenshtein_maxLengthWords'
+            ]
+        );
     }
 
     /**
