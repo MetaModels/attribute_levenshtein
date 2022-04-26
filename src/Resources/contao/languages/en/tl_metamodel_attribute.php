@@ -37,8 +37,8 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein'] = 'Rebuild 
 
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_minLengthWords'][0] = 'Minimum length of words';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_minLengthWords'][1] =
-    'Please select minimum length of words that shall get indexed.';
+    'Please select the minimum length of the words to be searched in the index.';
 
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_maxLengthWords'][0] = 'Maximum length of words';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_maxLengthWords'][1] =
-    'Please select maximum length of words that shall get indexed.';
+    'Please select the maximum length of the words to be searched in the index.';
