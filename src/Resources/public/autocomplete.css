@@ -1,0 +1,30 @@
+.result__container {
+  position: absolute;
+  background: white;
+}
+
+.result__container ul {
+  list-style-type: none;
+  width: 400px;
+  border: 1px solid #eee;
+  padding: 0px;
+  display: block;
+  position: relative;
+  top: -2px;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.result__container ul li {
+  padding: 10px 0 10px 10px;
+  cursor: pointer;
+}
+
+.result__container ul li:hover {
+  cursor: pointer;
+  background: #eee;
+}
+
+.result__container ul {
+  display: none;
+}
