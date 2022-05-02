@@ -153,7 +153,7 @@ class LevenshteinIndexLookup
 
         if (!empty($items)) {
             $procedure[] = \sprintf(
-                'tl_metamodel_levensthein.item IN (%1$s)',
+                'l.item IN (%1$s)',
                 \implode(',', \array_fill(0, \count($items), '?'))
             );
             $params      = \array_merge($params, $items);
@@ -164,12 +164,12 @@ class LevenshteinIndexLookup
             $attributeIds[] = $attribute->get('id');
         }
 
-        $procedure[] = '(tl_metamodel_levensthein_index.language=?)';
+        $procedure[] = '(tx.language=?)';
         $procedure[] = \sprintf(
-            '(tl_metamodel_levensthein_index.attribute IN (%1$s))',
+            '(lx.attribute IN (%1$s))',
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
-        $procedure[] = '(tl_metamodel_levensthein_index.word LIKE ?)';
+        $procedure[] = '(lx.word LIKE ?)';
         $params      = \array_merge(
             $params,
             [$language],
@@ -178,11 +178,12 @@ class LevenshteinIndexLookup
             $attributeIds
         );
         $query       = \sprintf(
-            'SELECT DISTINCT tl_metamodel_levensthein_index.word ' .
-            'FROM tl_metamodel_levensthein_index ' .
-            'LEFT JOIN tl_metamodel_levensthein ON (tl_metamodel_levensthein.id=tl_metamodel_levensthein_index.pid)' .
-            'WHERE ' . \implode(' AND ', $procedure) .
-            'ORDER BY FIELD(tl_metamodel_levensthein_index.attribute,%1$s),tl_metamodel_levensthein_index.word',
+            'SELECT DISTINCT lx.word, lx.attribute
+                FROM tl_metamodel_levensthein_index AS lx
+                LEFT JOIN tl_metamodel_levensthein AS l ON (l.id=lx.pid)
+                WHERE %1$s
+                ORDER BY FIELD(lx.attribute,%2$s), l.word',
+            \implode(' AND ', $procedure),
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
 
@@ -303,15 +304,15 @@ class LevenshteinIndexLookup
             $parameters[] = $searchWord;
             $parameters   = \array_merge($parameters, $attributeIds);
             $query        = \sprintf(
-                'SELECT t.attribute,t.item FROM tl_metamodel_levensthein AS t
-                            WHERE t.id IN (
-                                SELECT tx.pid
-                                FROM tl_metamodel_levensthein_index AS tx
-                                WHERE tx.language=?
-                                AND tx.attribute IN (%1$s)
-                                AND (tx.transliterated LIKE ? OR tx.word LIKE ?)
-                                )
-                            ORDER BY FIELD(t.attribute,%1$s)',
+                'SELECT l.attribute, l.item FROM tl_metamodel_levensthein AS l
+                    WHERE l.id IN (
+                        SELECT lx.pid
+                        FROM tl_metamodel_levensthein_index AS lx
+                        WHERE lx.language=?
+                        AND lx.attribute IN (%1$s)
+                        AND (lx.transliterated LIKE ? OR lx.word LIKE ?)
+                        )
+                    ORDER BY FIELD(l.attribute, %1$s)',
                 \implode(',', \array_fill(0, \count($attributeIds), '?'))
             );
 
@@ -357,17 +358,17 @@ class LevenshteinIndexLookup
         $parameters = \array_merge([$language], $attributeIds);
         $attributes = \implode(',', \array_fill(0, \count($attributeIds), '?'));
         $sql        = sprintf(
-            'SELECT t.attribute, t.item FROM tl_metamodel_levensthein AS t
-                WHERE t.id IN (
-                    SELECT tx.pid
-                        FROM tl_metamodel_levensthein_index AS tx
-                        WHERE tx.language=?
-                        AND tx.attribute IN (%1$s)
+            'SELECT l.attribute, l.item FROM tl_metamodel_levensthein AS l
+                WHERE l.id IN (
+                    SELECT lx.pid
+                        FROM tl_metamodel_levensthein_index AS lx
+                        WHERE lx.language=?
+                        AND lx.attribute IN (%1$s)
                         AND (%2$s)
-                        ORDER BY FIELD(tx.attribute,%1$s), tx.word
+                        ORDER BY FIELD(lx.attribute,%1$s), lx.word
                 )',
             $attributes,
-            'tx.transliterated=? OR tx.word=?'
+            'lx.transliterated=? OR lx.word=?'
         );
 
         foreach ($must as $word) {
@@ -454,13 +455,13 @@ class LevenshteinIndexLookup
     ): void {
         $words = $parser->getKeywords($this->minLength, $this->maxLength);
         $query = \sprintf(
-            'SELECT li.transliterated, li.word, li.pid, li.attribute, l.item
-                FROM tl_metamodel_levensthein_index AS li
-                RIGHT JOIN tl_metamodel_levensthein AS l ON (l.id=li.pid)
+            'SELECT lx.transliterated, lx.word, lx.pid, lx.attribute, l.item
+                FROM tl_metamodel_levensthein_index AS lx
+                RIGHT JOIN tl_metamodel_levensthein AS l ON (l.id=lx.pid)
                 WHERE
-                li.attribute IN (%1$s)
-                AND LENGTH(li.transliterated) BETWEEN ? AND ?
-                ORDER BY li.word
+                lx.attribute IN (%1$s)
+                AND LENGTH(lx.transliterated) BETWEEN ? AND ?
+                ORDER BY lx.word
                 ',
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
