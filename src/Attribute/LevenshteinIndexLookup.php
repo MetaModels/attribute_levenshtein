@@ -304,12 +304,14 @@ class LevenshteinIndexLookup
             $parameters   = \array_merge($parameters, $attributeIds);
             $query        = \sprintf(
                 'SELECT t.attribute,t.item FROM tl_metamodel_levensthein AS t
-                            WHERE t.id IN (SELECT tx.pid
-                            FROM tl_metamodel_levensthein_index AS tx
-                            WHERE tx.language=?
-                            AND tx.attribute IN (%1$s)
-                            AND (tx.transliterated LIKE ? OR tx.word LIKE ?)
-                            ) ORDER BY FIELD(t.attribute,%1$s)',
+                            WHERE t.id IN (
+                                SELECT tx.pid
+                                FROM tl_metamodel_levensthein_index AS tx
+                                WHERE tx.language=?
+                                AND tx.attribute IN (%1$s)
+                                AND (tx.transliterated LIKE ? OR tx.word LIKE ?)
+                                )
+                            ORDER BY FIELD(t.attribute,%1$s)',
                 \implode(',', \array_fill(0, \count($attributeIds), '?'))
             );
 
@@ -355,16 +357,17 @@ class LevenshteinIndexLookup
         $parameters = \array_merge([$language], $attributeIds);
         $attributes = \implode(',', \array_fill(0, \count($attributeIds), '?'));
         $sql        = sprintf(
-            'SELECT attribute,item FROM tl_metamodel_levensthein WHERE id IN (
-                SELECT pid
-                    FROM tl_metamodel_levensthein_index
-                    WHERE language=?
-                    AND attribute IN (%1$s)
-                    AND (%2$s)
-                    ORDER BY FIELD(attribute,%1$s),word
-            )',
+            'SELECT t.attribute, t.item FROM tl_metamodel_levensthein AS t
+                WHERE t.id IN (
+                    SELECT tx.pid
+                        FROM tl_metamodel_levensthein_index AS tx
+                        WHERE tx.language=?
+                        AND tx.attribute IN (%1$s)
+                        AND (%2$s)
+                        ORDER BY FIELD(tx.attribute,%1$s), tx.word
+                )',
             $attributes,
-            'transliterated=? OR word=?'
+            'tx.transliterated=? OR tx.word=?'
         );
 
         foreach ($must as $word) {
