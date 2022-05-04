@@ -232,9 +232,13 @@ class AttributeLevenshtein extends BaseComplex
      */
     private function getIndexedAttributes(): array
     {
+        if (null === ($attributeNames = $this->get('levensthein_attributes'))) {
+            return [];
+        }
+
         $metaModel  = $this->getMetaModel();
         $attributes = [];
-        foreach ($this->get('levensthein_attributes') as $attributeName) {
+        foreach ($attributeNames as $attributeName) {
             $attribute = $metaModel->getAttribute($attributeName);
             if ($attribute) {
                 $attributes[] = $attribute;
