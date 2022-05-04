@@ -164,7 +164,7 @@ class LevenshteinIndexLookup
             $attributeIds[] = $attribute->get('id');
         }
 
-        $procedure[] = '(tx.language=?)';
+        $procedure[] = '(lx.language=?)';
         $procedure[] = \sprintf(
             '(lx.attribute IN (%1$s))',
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
@@ -182,7 +182,7 @@ class LevenshteinIndexLookup
                 FROM tl_metamodel_levensthein_index AS lx
                 LEFT JOIN tl_metamodel_levensthein AS l ON (l.id=lx.pid)
                 WHERE %1$s
-                ORDER BY FIELD(lx.attribute,%2$s), l.word',
+                ORDER BY FIELD(lx.attribute,%2$s), lx.word',
             \implode(' AND ', $procedure),
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
