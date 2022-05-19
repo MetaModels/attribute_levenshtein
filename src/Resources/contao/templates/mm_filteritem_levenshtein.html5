@@ -32,6 +32,7 @@ $this->block('error'); ?>
     ?>
     <script>
         window.addEventListener('DOMContentLoaded', function(e) {
+            document.querySelector('#autocomplete__container_<?= $this->raw['eval']['attrId'] ?> input').setAttribute('autocomplete', 'off');
             let AutoComplete_<?= $this->raw['eval']['attrId'] ?> = new AutoComplete({
                                                       minChar : <?= $this->raw['eval']['minChar'] ?>,
                                                       selector: '<?= $this->raw['eval']['selector'] ?>',
