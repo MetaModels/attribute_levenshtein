@@ -81,7 +81,7 @@ class LevenshteinSearchSetting extends SimpleLookup
         $metaModel = $this->getMetaModel();
         $attribute = $metaModel->getAttributeById($this->get('attr_id'));
         $paramName = $this->getParamName();
-        $value     = $filterUrl[$paramName];
+        $value     = $filterUrl[$paramName] ?? '';
 
         if ($attribute && $paramName && $value) {
             /** @var AttributeLevenshtein $attribute */

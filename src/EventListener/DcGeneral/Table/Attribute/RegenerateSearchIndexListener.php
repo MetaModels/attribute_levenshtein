@@ -82,7 +82,7 @@ class RegenerateSearchIndexListener extends AbstractListener
 
         $input     = $event->getEnvironment()->getInputProvider();
         $metaModel = $this->getMetaModel(ModelId::fromSerialized($input->getParameter('pid'))->getId());
-        $attribute = $metaModel->getAttributeById(ModelId::fromSerialized($input->getParameter('id'))->getId());
+        $attribute = $metaModel->getAttributeById((int) ModelId::fromSerialized($input->getParameter('id'))->getId());
 
         $entries = $this->connection
             ->createQueryBuilder()

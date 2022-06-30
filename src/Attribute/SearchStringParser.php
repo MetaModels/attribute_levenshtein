@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levensthein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-202 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,14 +13,15 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 
-use Patchwork\Utf8;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * This class implements an general purpose search string parser.
@@ -122,7 +123,7 @@ class SearchStringParser
         preg_match_all('/"[^"]+"|[\+\-]?[^ ]+\*?/', $searchString, $chunks);
 
         if ($omitLastToken) {
-            $this->partial = utf8_strtolower(array_pop($chunks[0]));
+            $this->partial = mb_strtolower(array_pop($chunks[0]));
         }
         if (empty($chunks)) {
             return;
@@ -133,7 +134,7 @@ class SearchStringParser
         }
 
         if (!$omitLastToken) {
-            $this->partial = utf8_strtolower(array_pop($chunks[0]));
+            $this->partial = mb_strtolower(array_pop($chunks[0]));
         }
     }
 
@@ -196,7 +197,7 @@ class SearchStringParser
      */
     private function addKeywordToken($token)
     {
-        $value = Utf8::strtolower(trim($token));
+        $value = mb_strtolower(trim($token));
 
         if (empty($value)) {
             return;
@@ -214,7 +215,7 @@ class SearchStringParser
      */
     private function addMustToken($token)
     {
-        $value = Utf8::strtolower(trim($token));
+        $value = mb_strtolower(trim($token));
 
         if (empty($value)) {
             return;
@@ -234,7 +235,7 @@ class SearchStringParser
      */
     private function addMustNotToken($token)
     {
-        $value = Utf8::strtolower(trim($token));
+        $value = mb_strtolower(trim($token));
 
         if (empty($value)) {
             return;
@@ -342,7 +343,7 @@ class SearchStringParser
      */
     public function isMustNot($word)
     {
-        return isset($this->mustNot[Utf8::strtolower(trim($word))]);
+        return isset($this->mustNot[mb_strtolower(trim($word))]);
     }
 
     /**

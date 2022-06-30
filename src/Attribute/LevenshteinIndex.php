@@ -23,7 +23,7 @@ namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 
 use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\IAttribute;
-use Patchwork\Utf8;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
@@ -201,6 +201,6 @@ class LevenshteinIndex
             return $word;
         }
 
-        return Utf8::toAscii($word);
+        return (new UnicodeString($word))->ascii()->toString();
     }
 }

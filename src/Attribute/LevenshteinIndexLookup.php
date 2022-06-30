@@ -25,7 +25,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use MetaModels\Attribute\IAttribute;
 use MetaModels\Attribute\ITranslated;
-use Patchwork\Utf8;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
@@ -316,18 +316,18 @@ class LevenshteinIndexLookup
                 \implode(',', \array_fill(0, \count($attributeIds), '?'))
             );
 
-            $query = $this
+            $statement = $this
                 ->connection
-                ->prepare($query);
-            $query->execute($parameters);
+                ->prepare($query)
+                ->executeQuery($parameters);
 
-            if ($query->rowCount() === 0) {
+            if ($statement->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
                     $resultSet->addResult($word, $attribute, 0);
                 }
             }
 
-            while ($result = $query->fetchAssociative()) {
+            while ($result = $statement->fetchAssociative()) {
                 if (!empty($result['attribute']) && !empty($result['item'])) {
                     $resultSet->addResult($word, $result['attribute'], $result['item']);
                 }
@@ -583,6 +583,6 @@ class LevenshteinIndexLookup
             return $word;
         }
 
-        return Utf8::toAscii($word);
+        return (new UnicodeString($word))->ascii()->toString();
     }
 }
