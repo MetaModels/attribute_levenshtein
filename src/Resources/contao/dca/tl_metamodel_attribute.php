@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_attributes']
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['list']['operations']['rebuild_levensthein'] = [
-    'label' => $GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein'],
+    'label' => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein'],
     'href'  => 'act=rebuild_levensthein',
     'icon'  => 'bundles/metamodelsattributelevenshtein/levensthein.png'
 ];
