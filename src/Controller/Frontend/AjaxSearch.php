@@ -83,7 +83,7 @@ class AjaxSearch
             }
         }
 
-        $attribute = $metaModel->getAttributeById($attr);
+        $attribute = $metaModel->getAttributeById((int) $attr);
         if (!$attribute) {
             throw new PageNotFoundException('Attribute not found: ' . $attr);
         }
