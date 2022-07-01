@@ -65,7 +65,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             return $this->get('urlparam');
         }
 
-        $objAttribute = $this->getMetaModel()->getAttributeById($this->get('attr_id'));
+        $objAttribute = $this->getMetaModel()->getAttributeById((int) $this->get('attr_id'));
         if ($objAttribute) {
             return $objAttribute->getColName();
         }
@@ -79,7 +79,7 @@ class LevenshteinSearchSetting extends SimpleLookup
     public function prepareRules(IFilter $filter, $filterUrl)
     {
         $metaModel = $this->getMetaModel();
-        $attribute = $metaModel->getAttributeById($this->get('attr_id'));
+        $attribute = $metaModel->getAttributeById((int) $this->get('attr_id'));
         $paramName = $this->getParamName();
         $value     = $filterUrl[$paramName] ?? '';
 
@@ -149,7 +149,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             'count'     => [],
             'showCount' => $objFrontendFilterOptions->isShowCountValues(),
             'eval'      => [
-                'colname'      => $this->getMetaModel()->getAttributeById($attrId)->getColName(),
+                'colname'      => $this->getMetaModel()->getAttributeById((int) $attrId)->getColName(),
                 'urlparam'     => $this->getParamName(),
                 'template'     => $this->get('template'),
                 'hide_label'   => $this->get('hide_label'),
