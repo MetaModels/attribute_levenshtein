@@ -90,15 +90,15 @@ class RegenerateSearchIndexListener extends AbstractListener
             ->from('tl_metamodel_levensthein', 't')
             ->where('t.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
-            ->execute()
-            ->fetchAll(\PDO::FETCH_COLUMN);
+            ->executeQuery()
+            ->fetchFirstColumn();
 
         $this->connection
             ->createQueryBuilder()
             ->delete('tl_metamodel_levensthein')
             ->where('tl_metamodel_levensthein.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
-            ->execute();
+            ->executeQuery();
 
         if (!empty($entries)) {
             $this->connection
@@ -106,7 +106,7 @@ class RegenerateSearchIndexListener extends AbstractListener
                 ->delete('tl_metamodel_levensthein_index')
                 ->where('tl_metamodel_levensthein_index.pid IN(:pids)')
                 ->setParameter('pids', $entries, Connection::PARAM_STR_ARRAY)
-                ->execute();
+                ->executeQuery();
         }
 
         if ($metaModel instanceof ITranslatedMetaModel) {
@@ -139,8 +139,8 @@ class RegenerateSearchIndexListener extends AbstractListener
             ->from('tl_metamodel_levensthein_index', 'tx')
             ->where('tx.pid IN (SELECT t.id FROM tl_metamodel_levensthein AS t WHERE t.metamodel=:metamodel)')
             ->setParameter('metamodel', $metaModel->get('id'))
-            ->execute()
-            ->fetch(\PDO::FETCH_COLUMN);
+            ->executeQuery()
+            ->fetchFirstColumn();
 
         $refererEvent = new GetReferrerEvent(true, 'tl_metamodel_attribute');
         $this->dispatcher->dispatch($refererEvent, ContaoEvents::SYSTEM_GET_REFERRER);
