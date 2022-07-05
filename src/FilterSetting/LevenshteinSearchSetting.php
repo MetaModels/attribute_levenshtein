@@ -107,7 +107,7 @@ class LevenshteinSearchSetting extends SimpleLookup
     {
         if (($strParamName = $this->getParamName())) {
             return [
-                $strParamName => ($this->get('label') ? $this->get('label') : $this->getParamName())
+                $strParamName => ($this->getLabel() ? $this->getLabel() : $this->getParamName())
             ];
         }
 
@@ -142,7 +142,7 @@ class LevenshteinSearchSetting extends SimpleLookup
 
         $arrWidget = [
             'label'     => [
-                ($this->get('label') ? $this->get('label') : $this->getParamName()),
+                $this->getLabel(),
                 'GET: ' . $this->getParamName()
             ],
             'inputType' => 'text',
