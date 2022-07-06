@@ -165,7 +165,6 @@ class LevenshteinSearchSetting extends SimpleLookup
                 'autoSubmit'   => (int) $this->get('levenshtein_autoSubmit'),
             ]
         ];
-        $objFrontendFilterOptions->setAutoSubmit(false);
 
         $arrReturn[$this->getParamName()] =
             $this->prepareFrontendFilterWidget($arrWidget, $arrFilterUrl, $arrJumpTo, $objFrontendFilterOptions);
