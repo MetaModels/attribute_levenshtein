@@ -367,7 +367,10 @@ class ResultSet
                 $positives[$expression] = array_unique(array_merge($positives[$expression], $exprMatches));
 
                 foreach ($exprMatches as $match) {
-                    $points[$match] = $points[$match] ?? $point[$attributeId];
+                    if (!array_key_exists($match, $points)) {
+                        $points[$match] = $point[$attributeId];
+                    }
+                    $points[$match] |= $point[$attributeId];
                 }
             }
         }
