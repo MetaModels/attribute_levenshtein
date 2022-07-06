@@ -187,10 +187,7 @@ class LevenshteinIndexLookup
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
         );
 
-        $result = $this->connection->prepare($query);
-        $result->execute($params);
-
-        return $result->fetchFirstColumn();
+        return $this->connection->prepare($query)->executeQuery($params)->fetchFirstColumn();
     }
 
     /**
@@ -501,7 +498,7 @@ class LevenshteinIndexLookup
      */
     private function processCandidates(ResultSet $resultSet, string $chunk, Statement $results, int $distance): void
     {
-        while ($result = $results->fetchAssociative()) {
+        while ($result = $results->executeQuery()->fetchAssociative()) {
             if (empty($result['attribute']) || empty($result['item'])) {
                 continue;
             }
