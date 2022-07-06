@@ -17,35 +17,38 @@
 
 (function() {
     this.AutoComplete = function() {
-        this.minChar  = 1;
-        this.selector = '';
-        this.eventArr = [];
-        this.url      = '';
-        this.search   = '';
-        this.param    = '';
-        this.method   = '';
-        this.debug    = false
+        this.minChar    = 1;
+        this.selector   = '';
+        this.eventArr   = [];
+        this.url        = '';
+        this.search     = '';
+        this.param      = '';
+        this.method     = '';
+        this.autoSubmit = 0;
+        this.debug      = false
 
         // Define option defaults.
         let defaults = {
-            minChar : 1,
-            selector: '',
-            url     : '',
-            method  : 'GET',
-            param   : '',
-            debug   : false,
+            minChar   : 1,
+            selector  : '',
+            url       : '',
+            method    : 'GET',
+            param     : '',
+            autoSubmit: 0,
+            debug     : false,
         };
 
         if (arguments[0] && typeof arguments[0] === 'object') {
             this.options = extendDefaults(defaults, arguments[0]);
         }
 
-        this.minChar  = this.options.minChar;
-        this.selector = this.options.selector;
-        this.url      = this.options.url;
-        this.param    = this.options.param;
-        this.method   = this.options.method;
-        this.debug    = this.options.debug;
+        this.minChar    = this.options.minChar;
+        this.selector   = this.options.selector;
+        this.url        = this.options.url;
+        this.param      = this.options.param;
+        this.method     = this.options.method;
+        this.autoSubmit = this.options.autoSubmit;
+        this.debug      = this.options.debug;
 
         this.autocomplete();
         hideStyle(this);
@@ -154,6 +157,9 @@
                 document.querySelector('#' + _prop.selector + ' > input').value = this.getAttribute('data-value');
                 document.querySelector('#' + _prop.selector + ' > .result__container ul').innerHTML = '';
                 document.querySelector('#' + _prop.selector + ' > .result__container > ul').style.display = 'none';
+                if('1' === _prop.autoSubmit) {
+                    document.querySelector('#' + _prop.selector).closest('form').submit();
+                }
             });
         }
     }

@@ -29,7 +29,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_filtersetting']['metapalettes']['levensthein ex
         'placeholder',
         'cssID',
         'levenshtein_autocomplete',
-        'levenshtein_minChar'
+        'levenshtein_minChar',
+        'levenshtein_autoSubmit'
     ]
 ];
 
@@ -54,4 +55,12 @@ $GLOBALS['TL_DCA']['tl_metamodel_filtersetting']['fields']['levenshtein_minChar'
         'rgxp'     => 'natural',
     ],
     'sql'       => "varchar(2) NOT NULL default '3'"
+];
+
+$GLOBALS['TL_DCA']['tl_metamodel_filtersetting']['fields']['levenshtein_autoSubmit'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_autoSubmit'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => ['tl_class' => 'clr w50 cbx m12'],
+    'sql'       => "char(1) NOT NULL default ''"
 ];

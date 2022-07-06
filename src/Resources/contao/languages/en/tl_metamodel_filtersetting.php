@@ -23,7 +23,11 @@ $GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['typenames']['levensthein'] = 
 
 $GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_autocomplete'][0] = 'Activate autocomplete';
 $GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_autocomplete'][1] =
-    'You can activate the autocomplete at search field.';
+    'You can activate the autocomplete at search field - select the template for Levenshtein assisted search.';
 $GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_minChar'][0]      = 'Min. characters for autocomplete';
 $GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_minChar'][1]      =
     'Number of characters from which the autocomplete should work.';
+$GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_autoSubmit'][0]   =
+    'Submit form by autocomplete selection';
+$GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['levenshtein_autoSubmit'][1]   =
+    'If the checkbox is activated, the form is sent when the autocomplete selection is clicked.';
