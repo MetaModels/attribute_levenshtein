@@ -162,6 +162,7 @@ class LevenshteinSearchSetting extends SimpleLookup
                 'selector'     => !empty($cssID[0]) ? $cssID[0] : 'autocomplete__container_' . $attrId,
                 'autocomplete' => $this->get('levenshtein_autocomplete'),
                 'minChar'      => (int) $this->get('levenshtein_minChar'),
+                'autoSubmit'   => (int) $this->get('levenshtein_autoSubmit'),
             ]
         ];
         $objFrontendFilterOptions->setAutoSubmit(false);

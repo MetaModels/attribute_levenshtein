@@ -34,11 +34,12 @@ $this->block('error'); ?>
         window.addEventListener('DOMContentLoaded', function(e) {
             document.querySelector('#autocomplete__container_<?= $this->raw['eval']['attrId'] ?> input').setAttribute('autocomplete', 'off');
             let AutoComplete_<?= $this->raw['eval']['attrId'] ?> = new AutoComplete({
-                                                      minChar : <?= $this->raw['eval']['minChar'] ?>,
-                                                      selector: '<?= $this->raw['eval']['selector'] ?>',
-                                                      url     : 'mm_lv_search/<?= $this->raw['eval']['tableName'] ?>/<?= $this->raw['eval']['attrId'] ?>',
-                                                      param   : '&language=<?= $this->raw['eval']['language'] ?>',
-                                                      debug   : '<?= ($min ? 0 : 1) ?>',
+                                                      minChar    : <?= $this->raw['eval']['minChar'] ?>,
+                                                      selector   : '<?= $this->raw['eval']['selector'] ?>',
+                                                      url        : 'mm_lv_search/<?= $this->raw['eval']['tableName'] ?>/<?= $this->raw['eval']['attrId'] ?>',
+                                                      param      : '&language=<?= $this->raw['eval']['language'] ?>',
+                                                      autoSubmit : '<?= $this->raw['eval']['autoSubmit'] ?>',
+                                                      debug      : '<?= ($min ? 0 : 1) ?>',
                                                   });
         });
     </script>
