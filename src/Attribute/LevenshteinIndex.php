@@ -98,7 +98,7 @@ class LevenshteinIndex
             ->setParameter('item', $itemId)
             ->setParameter('language', $language)
             ->setMaxResults(1)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         if (count($entries)) {
