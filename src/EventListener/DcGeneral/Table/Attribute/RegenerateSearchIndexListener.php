@@ -140,7 +140,7 @@ class RegenerateSearchIndexListener extends AbstractListener
             ->where('tx.pid IN (SELECT t.id FROM tl_metamodel_levensthein AS t WHERE t.metamodel=:metamodel)')
             ->setParameter('metamodel', $metaModel->get('id'))
             ->executeQuery()
-            ->fetchFirstColumn();
+            ->fetchOne();
 
         $refererEvent = new GetReferrerEvent(true, 'tl_metamodel_attribute');
         $this->dispatcher->dispatch($refererEvent, ContaoEvents::SYSTEM_GET_REFERRER);
