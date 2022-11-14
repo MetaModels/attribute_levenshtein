@@ -121,7 +121,7 @@ class RegenerateSearchIndexListener extends AbstractListener
             $metaModel->selectLanguage($languageBackup);
         } else {
             $languageBackup = $GLOBALS['TL_LANGUAGE'];
-            $languages = $metaModel->isTranslated(false)
+            $languages      = $metaModel->isTranslated(false)
                 ? $metaModel->getAvailableLanguages()
                 : [$languageBackup];
             foreach ($languages as $language) {
