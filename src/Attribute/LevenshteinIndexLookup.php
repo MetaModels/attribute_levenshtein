@@ -14,6 +14,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
@@ -271,7 +272,7 @@ class LevenshteinIndexLookup
     /**
      * Find exact matches of chunks and return the parent ids.
      *
-     * @param list<string>       $attributeIds The attributes to search on.
+     * @param array|list<string> $attributeIds The attributes to search on.
      * @param string             $language     The language key.
      * @param SearchStringParser $parser       The chunks to search for.
      * @param ResultSet          $resultSet    The result set to add to.
@@ -290,14 +291,14 @@ class LevenshteinIndexLookup
 
         foreach ($parser->getKeywords() as $word) {
             $searchWord = \str_replace(
-                              ['*', '?'],
-                              ['%', '_'],
-                              \str_replace(
-                                  ['%', '_'],
-                                  ['\%', '\_'],
-                                  $word
-                              )
-                          ) . '%';
+                ['*', '?'],
+                ['%', '_'],
+                \str_replace(
+                    ['%', '_'],
+                    ['\%', '\_'],
+                    $word
+                )
+            ) . '%';
 
             $parameters   = \array_merge([$language], $attributeIds);
             $parameters[] = $this->normalizeWord($searchWord);
@@ -338,7 +339,7 @@ class LevenshteinIndexLookup
     /**
      * Find exact matches of chunks and return the parent ids.
      *
-     * @param list<string>       $attributeIds The attributes to search on.
+     * @param array|list<string> $attributeIds The attributes to search on.
      * @param string             $language     The language key.
      * @param SearchStringParser $parser       The chunks to search for.
      * @param ResultSet          $resultSet    The result set to add to.
@@ -394,7 +395,7 @@ class LevenshteinIndexLookup
     /**
      * Find exact matches of chunks and return the parent ids.
      *
-     * @param list<string>       $attributeIds The attributes to search on.
+     * @param array|list<string> $attributeIds The attributes to search on.
      * @param string             $language     The language key.
      * @param SearchStringParser $parser       The chunks to search for.
      * @param ResultSet          $resultSet    The result set to add to.
@@ -442,7 +443,7 @@ class LevenshteinIndexLookup
     /**
      * Retrieve all words from the search index valid as levenshtein candidates.
      *
-     * @param list<string>       $attributeIds The ids of the attributes to query.
+     * @param array|list<string> $attributeIds The ids of the attributes to query.
      * @param SearchStringParser $parser       The chunks to search for.
      * @param ResultSet          $resultSet    The result set to add to.
      *
