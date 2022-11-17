@@ -14,13 +14,14 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2021 The MetaModels team.
+ * @copyright  2012-2022 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\Test\Attribute;
 
+use Doctrine\DBAL\Connection;
 use MetaModels\AttributeLevenshteinBundle\Attribute\AttributeLevenshtein;
 use MetaModels\IMetaModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -70,7 +71,8 @@ class AttributeLevenshteinTest extends TestCase
      */
     public function testInstantiation()
     {
-        $text = new AttributeLevenshtein($this->mockMetaModel('en', 'en'));
+        $connection = $this->createMock(Connection::class);
+        $text       = new AttributeLevenshtein($this->mockMetaModel('en', 'en'), [], $connection);
         self::assertInstanceOf(AttributeLevenshtein::class, $text);
     }
 }
