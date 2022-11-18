@@ -131,7 +131,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             return [];
         }
 
-        if (!($attribute = $this->getFilteredAttribute())) {
+        if (!$this->getFilteredAttribute()) {
             return [];
         }
 
@@ -153,7 +153,10 @@ class LevenshteinSearchSetting extends SimpleLookup
                 'urlparam'     => $this->getParamName(),
                 'template'     => $this->get('template'),
                 'hide_label'   => $this->get('hide_label'),
-                'cssID'        => sprintf(' id="%s"',!empty($cssID[0]) ? $cssID[0] : 'autocomplete__container_' . $attrId),
+                'cssID'        => sprintf(
+                    ' id="%s"',
+                    !empty($cssID[0]) ? $cssID[0] : 'autocomplete__container_' . $attrId
+                ),
                 'class'        => !empty($cssID[1]) ? ' ' . $cssID[1] : '',
                 'placeholder'  => $this->get('placeholder'),
                 'tableName'    => $this->getMetaModel()->getTableName(),
