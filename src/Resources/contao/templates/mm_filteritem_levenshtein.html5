@@ -1,0 +1,47 @@
+<?php
+
+use Contao\System;
+
+$this->block('error'); ?>
+<?php if ($this->errors): ?>
+    <?php foreach ($this->errors as $error): ?>
+        <p class="error"><?= $error ?></p>
+    <?php endforeach; ?>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+
+<?php $this->block('formlabel'); ?>
+<?php if (!$this->hide_label): ?>
+    <?= $this->label ?>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+<?php $this->block('formfield'); ?>
+<?= $this->formfield ?>
+<?php if($this->raw['eval']['autocomplete']) : ?>
+    <div class="result__container">
+        <ul>
+        </ul>
+    </div>
+    <?php
+    $min = System::getContainer()->get('kernel')->isDebug() ? '' : '.min';
+
+    $GLOBALS['TL_CSS']['metamodelsattribute_levenshtein']  = sprintf(
+        'bundles/metamodelsattributelevenshtein/autocomplete%s.css', $min);
+    $GLOBALS['TL_BODY']['metamodelsattribute_levenshtein'] = sprintf(
+    '<script src="bundles/metamodelsattributelevenshtein/autocomplete%s.js"></script>', $min);
+    ?>
+    <script>
+        window.addEventListener('DOMContentLoaded', function(e) {
+            document.querySelector('#autocomplete__container_<?= $this->raw['eval']['attrId'] ?> input').setAttribute('autocomplete', 'off');
+            let AutoComplete_<?= $this->raw['eval']['attrId'] ?> = new AutoComplete({
+                                                      minChar    : <?= $this->raw['eval']['minChar'] ?>,
+                                                      selector   : '<?= $this->raw['eval']['selector'] ?>',
+                                                      url        : 'mm_lv_search/<?= $this->raw['eval']['tableName'] ?>/<?= $this->raw['eval']['attrId'] ?>',
+                                                      param      : '&language=<?= $this->raw['eval']['language'] ?>',
+                                                      autoSubmit : '<?= $this->raw['eval']['autoSubmit'] ?>',
+                                                      debug      : '<?= ($min ? 0 : 1) ?>',
+                                                  });
+        });
+    </script>
+<?php endif; ?>
+<?php $this->endblock(); ?>

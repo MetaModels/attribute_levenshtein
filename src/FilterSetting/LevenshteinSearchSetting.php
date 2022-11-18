@@ -1,25 +1,27 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels/attribute_levensthein
+ * @package    MetaModels/attribute_levenshtein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2022 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\FilterSetting;
 
+use Contao\StringUtil;
 use MetaModels\AttributeLevenshteinBundle\Attribute\AttributeLevenshtein;
 use MetaModels\AttributeLevenshteinBundle\FilterRule\LevenstheinSearchRule;
 use MetaModels\Filter\IFilter;
@@ -95,7 +97,7 @@ class LevenshteinSearchSetting extends SimpleLookup
      */
     public function getParameters()
     {
-        return ($strParamName = $this->getParamName()) ? array($strParamName) : array();
+        return ($strParamName = $this->getParamName()) ? [$strParamName] : [];
     }
 
     /**
@@ -104,12 +106,12 @@ class LevenshteinSearchSetting extends SimpleLookup
     public function getParameterFilterNames()
     {
         if (($strParamName = $this->getParamName())) {
-            return array(
-                $strParamName => ($this->get('label') ? $this->get('label') : $this->getParamName())
-            );
+            return [
+                $strParamName => ($this->getLabel() ? $this->getLabel() : $this->getParamName())
+            ];
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -125,98 +127,50 @@ class LevenshteinSearchSetting extends SimpleLookup
         $arrJumpTo,
         FrontendFilterOptions $objFrontendFilterOptions
     ) {
-        $arrReturn = array();
-        $paramName = $this->getParamName();
-        $tableName = $this->getMetaModel()->getTableName();
-        $attrId    = $this->get('attr_id');
-        $language  = $this->getMetaModel()->getActiveLanguage();
-        $this->addFilterParam($paramName);
-
-        // Address search.
-        $arrCount  = array();
-        $arrWidget = array(
-            'label'     => array(
-                ($this->get('label') ? $this->get('label') : $paramName),
-                'GET: ' . $paramName
-            ),
-            'inputType' => 'text',
-            'count'     => $arrCount,
-            'showCount' => $objFrontendFilterOptions->isShowCountValues(),
-            'eval'      => array(
-                'colname'  => $this->getMetaModel()->getAttributeById($attrId)->getColName(),
-                'urlparam' => $paramName,
-                'template' => $this->get('template'),
-            )
-        );
-        $objFrontendFilterOptions->setAutoSubmit(false);
-
-        $arrReturn[$paramName] =
-            $this->prepareFrontendFilterWidget($arrWidget, $arrFilterUrl, $arrJumpTo, $objFrontendFilterOptions);
-
-        $GLOBALS['TL_JQUERY'][] = <<<EOF
-  <script>
-  $(function() {
-    function split(val) {
-        var arr = val.match(/\w+|"[^"]+"/g),
-            i   = arr ? arr.length : 0;
-        while(i--){
-            arr[i] = arr[i].replace(/"/g,"");
+        if (!$this->enableFEFilterWidget()) {
+            return [];
         }
-        return arr ? arr : [];
-    }
-    function extractLast(term) {
-      var chunks = split(term);
-      return chunks.length ? chunks.pop() : '';
-    }
 
-    $("#ctrl_$paramName")
-      // don't navigate away from the field on tab when selecting an item
-        .bind("keydown", function(event) {
-            if (event.keyCode === $.ui.keyCode.TAB && $(this).autocomplete("instance").menu.active) {
-                event.preventDefault();
-            }
-        })
-        .autocomplete({
-            source: function(request, response) {
-                $.getJSON(
-                    "mm_lv_search/$tableName/$attrId",
-                    {
-                        language: "$language",
-                        search: request.term
-                    },
-                    response
-                );
-            },
-            search: function() {
-                // custom minLength
-                var term = extractLast(this.value);
-                if (term.length < 2) {
-                    return false;
-                }
-            },
-            focus: function() {
-                // prevent value inserted on focus
-                return false;
-            },
-            select: function(event, ui) {
-                var terms = split(this.value);
-                // remove the current input
-                var last = terms.pop();
-                // add the selected item
-                if (last.charAt(0) === '"') { // FIXME: this is currently always false.
-                    terms.push('"' + ui.item.value);
-                } else {
-                    terms.push(ui.item.value);
-                }
-                // add placeholder to get the space at the end
-                terms.push("");
-                this.value = terms.join(" ");
-                return false;
-            }
-        });
-    });
-</script>
-EOF;
+        if (!$this->getFilteredAttribute()) {
+            return [];
+        }
+
+        $this->addFilterParam($this->getParamName());
+        $arrReturn = [];
+        $attrId    = $this->get('attr_id');
+        $cssID     = StringUtil::deserialize($this->get('cssID'), true);
+
+        $arrWidget = [
+            'label'     => [
+                $this->getLabel(),
+                'GET: ' . $this->getParamName()
+            ],
+            'inputType' => 'text',
+            'count'     => [],
+            'showCount' => $objFrontendFilterOptions->isShowCountValues(),
+            'eval'      => [
+                'colname'      => $this->getMetaModel()->getAttributeById($attrId)->getColName(),
+                'urlparam'     => $this->getParamName(),
+                'template'     => $this->get('template'),
+                'hide_label'   => $this->get('hide_label'),
+                'cssID'        => sprintf(
+                    ' id="%s"',
+                    !empty($cssID[0]) ? $cssID[0] : 'autocomplete__container_' . $attrId
+                ),
+                'class'        => !empty($cssID[1]) ? ' ' . $cssID[1] : '',
+                'placeholder'  => $this->get('placeholder'),
+                'tableName'    => $this->getMetaModel()->getTableName(),
+                'attrId'       => $attrId,
+                'language'     => $this->getMetaModel()->getActiveLanguage(),
+                'selector'     => !empty($cssID[0]) ? $cssID[0] : 'autocomplete__container_' . $attrId,
+                'autocomplete' => $this->get('levenshtein_autocomplete'),
+                'minChar'      => (int) $this->get('levenshtein_minChar'),
+                'autoSubmit'   => (int) $this->get('levenshtein_autoSubmit'),
+            ]
+        ];
+
+        $arrReturn[$this->getParamName()] =
+            $this->prepareFrontendFilterWidget($arrWidget, $arrFilterUrl, $arrJumpTo, $objFrontendFilterOptions);
 
         return $arrReturn;
     }
@@ -226,7 +180,7 @@ EOF;
      */
     public function getParameterDCA()
     {
-        return array();
+        return [];
     }
 
     /**

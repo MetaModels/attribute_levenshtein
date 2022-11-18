@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levensthein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2021 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,8 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2012-2021 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -26,10 +27,13 @@ use MetaModels\AttributeLevenshteinBundle\Attribute\AttributeLevenshtein;
 use MetaModels\AttributeLevenshteinBundle\Attribute\LevenshteinAttributeTypeFactory;
 use MetaModels\Helper\TableManipulator;
 use MetaModels\IMetaModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test the attribute factory.
+ *
+ * @covers \MetaModels\AttributeLevenshteinBundle\Attribute\LevenshteinAttributeTypeFactory
  */
 class LevenshteinAttributeTypeFactoryTest extends TestCase
 {
@@ -42,26 +46,26 @@ class LevenshteinAttributeTypeFactoryTest extends TestCase
      *
      * @param string $fallbackLanguage The fallback language.
      *
-     * @return IMetaModel|\PHPUnit_Framework_MockObject_MockObject
+     * @return IMetaModel|MockObject
      */
     protected function mockMetaModel($tableName, $language, $fallbackLanguage)
     {
         $metaModel = $this->getMockBuilder(IMetaModel::class)->getMockForAbstractClass();
 
         $metaModel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getTableName')
-            ->will($this->returnValue($tableName));
+            ->willReturn($tableName);
 
         $metaModel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getActiveLanguage')
-            ->will($this->returnValue($language));
+            ->willReturn($language);
 
         $metaModel
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getFallbackLanguage')
-            ->will($this->returnValue($fallbackLanguage));
+            ->willReturn($fallbackLanguage);
 
         return $metaModel;
     }
@@ -69,7 +73,7 @@ class LevenshteinAttributeTypeFactoryTest extends TestCase
     /**
      * Mock the database connection.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return MockObject|Connection
      */
     private function mockConnection()
     {
@@ -83,7 +87,7 @@ class LevenshteinAttributeTypeFactoryTest extends TestCase
      *
      * @param Connection $connection The database connection mock.
      *
-     * @return TableManipulator|\PHPUnit_Framework_MockObject_MockObject
+     * @return TableManipulator|MockObject
      */
     private function mockTableManipulator(Connection $connection)
     {
@@ -123,10 +127,10 @@ class LevenshteinAttributeTypeFactoryTest extends TestCase
             $this->mockMetaModel('mm_test', 'de', 'en')
         );
 
-        $this->assertInstanceOf(AttributeLevenshtein::class, $attribute);
+        self::assertInstanceOf(AttributeLevenshtein::class, $attribute);
 
         foreach ($values as $key => $value) {
-            $this->assertEquals($value, $attribute->get($key), $key);
+            self::assertEquals($value, $attribute->get($key), $key);
         }
     }
 }
