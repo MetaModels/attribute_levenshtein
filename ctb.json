@@ -1,11 +1,11 @@
 {
   "transifex": {
     "project": "metamodels",
-    "prefix": "attribute_levensthein-",
+    "prefix": "attribute_levenshtein-",
     "languages_cto": "src/Resources/contao/languages",
     "languages_tx": ".tx",
     "php-file-header": [
-      "This file is part of MetaModels/attribute_levensthein.",
+      "This file is part of MetaModels/attribute_levenshtein.",
       "",
       "(c) 2012-$$year$$ The MetaModels team.",
       "",
@@ -20,7 +20,7 @@
       "Last-updated: $$lastchanged$$",
       "",
       "@copyright 2012-$$year$$ The MetaModels team.",
-      "@license   https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later",
+      "@license   https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later",
       "@link      https://www.transifex.com/metamodels/public/",
       "@link      https://www.transifex.com/signup/?join_project=metamodels"
     ]
