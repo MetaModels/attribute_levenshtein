@@ -59,10 +59,7 @@
     }
   },
   "extra": {
-    "contao-manager-plugin": "MetaModels\\AttributeLevenshteinBundle\\ContaoManager\\Plugin",
-    "branch-alias": {
-      "dev-hotfix/2.2.1": "2.2.1-dev"
-    }
+    "contao-manager-plugin": "MetaModels\\AttributeLevenshteinBundle\\ContaoManager\\Plugin"
   },
   "config": {
     "allow-plugins": {
