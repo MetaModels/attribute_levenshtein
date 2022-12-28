@@ -1,20 +1,21 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2022 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels/attribute_levensthein
+ * @package    MetaModels/attribute_levenshtein
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2022 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -49,5 +50,9 @@ class MetaModelsAttributeLevenshteinExtension extends Extension
         foreach ($this->files as $file) {
             $loader->load($file);
         }
+
+        $managedSchemaTypeNames   = $container->getParameter('metamodels.managed-schema-type-names') ?? [];
+        $managedSchemaTypeNames[] = 'levensthein';
+        $container->setParameter('metamodels.managed-schema-type-names', $managedSchemaTypeNames);
     }
 }
