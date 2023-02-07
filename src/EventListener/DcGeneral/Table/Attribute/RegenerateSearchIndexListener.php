@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2023 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,7 @@
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2023 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -29,6 +29,7 @@ use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\AbstractEnvironmentAwareEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\ActionEvent;
 use Doctrine\DBAL\Connection;
+use MetaModels\Helper\LocaleUtil;
 use MetaModels\IFactory;
 use MetaModels\ITranslatedMetaModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -113,24 +114,28 @@ class RegenerateSearchIndexListener extends AbstractListener
             $languageBackup = $metaModel->getLanguage();
             foreach ($metaModel->getLanguages() as $language) {
                 $metaModel->selectLanguage($language);
-                $GLOBALS['TL_LANGUAGE'] = $language;
+                // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
+                $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($language);
                 foreach ($metaModel->findByFilter(null) as $item) {
                     $attribute->modelSaved($item);
                 }
             }
             $metaModel->selectLanguage($languageBackup);
         } else {
-            $languageBackup = $GLOBALS['TL_LANGUAGE'];
+            // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
+            $languageBackup = LocaleUtil::formatAsLocale($GLOBALS['TL_LANGUAGE']);
             $languages      = $metaModel->isTranslated(false)
                 ? $metaModel->getAvailableLanguages()
                 : [$languageBackup];
             foreach ($languages as $language) {
-                $GLOBALS['TL_LANGUAGE'] = $language;
+                // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
+                $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($language);
                 foreach ($metaModel->findByFilter(null) as $item) {
                     $attribute->modelSaved($item);
                 }
             }
-            $GLOBALS['TL_LANGUAGE'] = $languageBackup;
+            // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
+            $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($languageBackup);
         }
 
         $count = $this->connection
