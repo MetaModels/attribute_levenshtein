@@ -123,7 +123,7 @@ class RegenerateSearchIndexListener extends AbstractListener
             $metaModel->selectLanguage($languageBackup);
         } else {
             // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
-            $languageBackup = LocaleUtil::formatAsLocale($GLOBALS['TL_LANGUAGE']);
+            $languageBackup = $GLOBALS['TL_LANGUAGE'];
             $languages      = $metaModel->isTranslated(false)
                 ? $metaModel->getAvailableLanguages()
                 : [$languageBackup];
@@ -135,7 +135,7 @@ class RegenerateSearchIndexListener extends AbstractListener
                 }
             }
             // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
-            $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($languageBackup);
+            $GLOBALS['TL_LANGUAGE'] = $languageBackup;
         }
 
         $count = $this->connection
