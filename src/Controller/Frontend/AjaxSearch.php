@@ -89,7 +89,11 @@ class AjaxSearch
         }
 
         /** @var AttributeLevenshtein $attribute */
-        $suggestions = $attribute->getSuggestions($search);
+        $suggestions = array_values(
+            array_unique(
+                $attribute->getSuggestions($search)
+            )
+        );
 
         return new JsonResponse(
             array_map(
