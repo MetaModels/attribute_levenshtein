@@ -12,3 +12,17 @@ levenshtein algorithm.
 There is a filter rule that enables a similarity search via the created index. Optionally, an auto-completion
 ("Vanilla Script") can be activated (please note the template selection).
 
+Adjustment of the index table
+-----------------------------
+
+The fields for storing the index can be enlarged as required e.g. from a length of `64` to `256`.
+To do this, create a corresponding DCA file and adjust the values. (Note: the keys and the file name still
+have the old, wrong notation with "sth").
+
+```php
+// contao/dca/tl_metamodel_levensthein_index.php
+$GLOBALS['TL_DCA']['tl_metamodel_levensthein_index']['fields']['transliterated']['sql'] =
+    'varbinary(256) NOT NULL default \'\'';
+$GLOBALS['TL_DCA']['tl_metamodel_levensthein_index']['fields']['word']['sql']           =
+    'varchar(256) COLLATE utf8_bin NOT NULL default \'\'';
+```

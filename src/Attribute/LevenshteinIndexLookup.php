@@ -15,7 +15,8 @@
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2022 The MetaModels team.
+ * @author     Oliver Willmes <info@oliverwillmes.de>
+ * @copyright  2012-2023 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -183,6 +184,7 @@ class LevenshteinIndexLookup
                 FROM tl_metamodel_levensthein_index AS lx
                 LEFT JOIN tl_metamodel_levensthein AS l ON (l.id=lx.pid)
                 WHERE %1$s
+                GROUP BY lx.word
                 ORDER BY FIELD(lx.attribute,%2$s), lx.word',
             \implode(' AND ', $procedure),
             \implode(',', \array_fill(0, \count($attributeIds), '?'))
