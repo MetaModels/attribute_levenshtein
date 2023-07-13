@@ -24,5 +24,5 @@ have the old, wrong notation with "sth").
 $GLOBALS['TL_DCA']['tl_metamodel_levensthein_index']['fields']['transliterated']['sql'] =
     'varbinary(256) NOT NULL default \'\'';
 $GLOBALS['TL_DCA']['tl_metamodel_levensthein_index']['fields']['word']['sql']           =
-    'varchar(256) COLLATE utf8_bin NOT NULL default \'\'';
+    'varchar(256) BINARY NOT NULL default \'\'';
 ```
