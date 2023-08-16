@@ -1,8 +1,9 @@
 <?php
+
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2023 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,14 +13,12 @@
  * Translations are managed automatically using Transifex. To create a new translation
  * or to help to maintain an existing one, please register at transifex.com.
  *
- * Last-updated: 2019-03-11T19:38:59+01:00
+ * Last-updated: 2023-08-16T21:03:06+02:00
  *
- * @copyright 2012-2019 The MetaModels team.
- * @license   https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @copyright 2012-2023 The MetaModels team.
+ * @license   https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @link      https://www.transifex.com/metamodels/public/
  * @link      https://www.transifex.com/signup/?join_project=metamodels
  */
 
-
 $GLOBALS['TL_LANG']['tl_metamodel_filtersetting']['typenames']['levensthein'] = 'Поиск Левенштейна';
-
