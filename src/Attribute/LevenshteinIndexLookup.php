@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2023 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -482,8 +482,8 @@ class LevenshteinIndexLookup
                 continue;
             }
 
-            $results = $this->connection->prepare($query);
-            $results->execute(\array_merge($attributeIds, [$minLen, $maxLen]));
+            $results = $this->connection->prepare($query)
+                ->executeQuery(\array_merge($attributeIds, [$minLen, $maxLen]));
 
             $this->processCandidates($resultSet, $chunk, $results, $distance);
         }
@@ -494,14 +494,14 @@ class LevenshteinIndexLookup
      *
      * @param ResultSet $resultSet The result list to add to.
      * @param string    $chunk     The chunk being processed.
-     * @param Statement $results   The results to process.
+     * @param Result    $results   The results to process.
      * @param int       $distance  The acceptable distance.
      *
      * @return void
      */
-    private function processCandidates(ResultSet $resultSet, string $chunk, Statement $results, int $distance): void
+    private function processCandidates(ResultSet $resultSet, string $chunk, Result $results, int $distance): void
     {
-        while ($result = $results->executeQuery()->fetchAssociative()) {
+        while ($result = $results->fetchAssociative()) {
             if (empty($result['attribute']) || empty($result['item'])) {
                 continue;
             }
