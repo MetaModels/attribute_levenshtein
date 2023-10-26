@@ -24,7 +24,7 @@
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Result;
 use MetaModels\Attribute\IAttribute;
 use MetaModels\Attribute\ITranslated;
 use Symfony\Component\String\UnicodeString;
