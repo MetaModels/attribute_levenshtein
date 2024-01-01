@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levensthein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,14 +14,12 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
-
-use Symfony\Component\String\UnicodeString;
 
 /**
  * This class represents a list of forbidden words.
@@ -31,29 +29,28 @@ class Blacklist
     /**
      * The language codes.
      *
-     * @var string
+     * @var array
      */
-    private $languages = array();
+    private array $languages = [];
 
     /**
      * The list of words.
      *
      * @var array<string,string>
      */
-    private $words = array();
+    private array $words = [];
 
     /**
      * Add a language to the blacklist.
      *
      * @param string $language The language code.
-     *
      * @param array  $list     The initial list of words.
      *
      * @return void
      *
      * @throws \InvalidArgumentException When the language has already been added.
      */
-    public function addLanguage($language, $list = array())
+    public function addLanguage($language, $list = [])
     {
         if ($this->hasLanguage($language)) {
             throw new \InvalidArgumentException('Language ' . $language . ' already registered.');
@@ -88,7 +85,7 @@ class Blacklist
      */
     public function addWord($language, $word)
     {
-        $word = mb_strtolower($word);
+        $word = \mb_strtolower($word);
 
         $this->words[$language][$word] = $word;
     }
@@ -103,7 +100,7 @@ class Blacklist
     public function filter(WordList $list)
     {
         $language = $list->getLanguage();
-        $words    = array();
+        $words    = [];
         foreach ($list->getWords() as $word) {
             if (!$this->matches($language, $word)) {
                 $words[] = $word;
@@ -123,6 +120,6 @@ class Blacklist
      */
     public function matches($language, $word)
     {
-        return isset($this->words[$language][mb_strtolower($word)]);
+        return isset($this->words[$language][\mb_strtolower($word)]);
     }
 }

@@ -26,5 +26,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MetaModelsAttributeLevenshteinBundle extends Bundle
 {
-
 }

@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2023 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Oliver Willmes <info@oliverwillmes.de>
- * @copyright  2012-2023 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -31,6 +31,8 @@ use Symfony\Component\String\UnicodeString;
 
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class LevenshteinIndexLookup
 {
@@ -284,7 +286,7 @@ class LevenshteinIndexLookup
         SearchStringParser $parser,
         ResultSet $resultSet
     ): void {
-        if ($parser->getKeywords() == []) {
+        if ($parser->getKeywords() === []) {
             return;
         }
 
@@ -372,18 +374,19 @@ class LevenshteinIndexLookup
         );
 
         foreach ($must as $word) {
-            $query = $this->connection->prepare($sql);
-            $query->execute(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
+            $query     = $this->connection->prepare($sql);
+            $statement =
+                $query->executeQuery(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
 
             // If no matches, add an empty array.
-            if ($query->rowCount() === 0) {
+            if ($statement->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
                     $resultSet->addMustResult($word, $attribute, 0);
                 }
                 continue;
             }
 
-            while ($row = $query->fetchAssociative()) {
+            while ($row = $statement->fetchAssociative()) {
                 if (!empty($row['attribute']) && !empty($row['item'])) {
                     $resultSet->addMustResult($word, $row['attribute'], $row['item']);
                 }
@@ -428,10 +431,11 @@ class LevenshteinIndexLookup
         );
 
         foreach ($must as $word) {
-            $query = $this->connection->prepare($sql);
-            $query->execute(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
+            $query     = $this->connection->prepare($sql);
+            $statement =
+                $query->executeQuery(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
 
-            while ($row = $query->fetchAssociative()) {
+            while ($row = $statement->fetchAssociative()) {
                 if (!empty($row['attribute']) && !empty($row['item'])) {
                     $resultSet->addNegativeResult($word, $row['attribute'], $row['item']);
                 }
@@ -533,7 +537,7 @@ class LevenshteinIndexLookup
                 break;
             }
 
-            $distance = (int) $allowedDistance;
+            $distance = $allowedDistance;
         }
 
         return $distance;
@@ -579,7 +583,7 @@ class LevenshteinIndexLookup
      */
     private function normalizeWord(string $word): string
     {
-        if (\mb_detect_encoding($word) == 'ASCII') {
+        if (\mb_detect_encoding($word) === 'ASCII') {
             return $word;
         }
 

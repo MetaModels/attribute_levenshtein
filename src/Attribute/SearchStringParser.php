@@ -21,10 +21,8 @@
 
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 
-use Symfony\Component\String\UnicodeString;
-
 /**
- * This class implements an general purpose search string parser.
+ * This class implements a general purpose search string parser.
  */
 class SearchStringParser
 {
@@ -33,48 +31,47 @@ class SearchStringParser
      *
      * @var string
      */
-    private $string;
+    private string $string;
 
     /**
      * All keywords that must be contained.
      *
      * @var string[]
      */
-    private $must = array();
+    private array $must = [];
 
     /**
      * All keywords that must NOT be contained.
      *
      * @var string[]
      */
-    private $mustNot = array();
+    private array $mustNot = [];
 
     /**
      * All literal representations that must be contained.
      *
      * @var string[]
      */
-    private $literal = array();
+    private array $literal = [];
 
     /**
      * All keywords to search for.
      *
      * @var string[]
      */
-    private $keyword = array();
+    private array $keyword = [];
 
     /**
      * The last token from the input string.
      *
      * @var string
      */
-    private $partial;
+    private string $partial = '';
 
     /**
      * Create a new instance.
      *
      * @param string $string        The search string to tokenize.
-     *
      * @param bool   $omitLastToken If true, the last token will be ignored as it is partial.
      */
     public function __construct($string, $omitLastToken = false)
@@ -89,18 +86,18 @@ class SearchStringParser
      *
      * @param bool $omitLastToken If true, the last token will be ignored as it is partial.
      *
-     * @throws \Exception When the search string is empty.
-     *
      * @return void
+     *@throws \Exception When the search string is empty.
+     *
      */
-    private function parseSearchString($omitLastToken)
+    private function parseSearchString(bool $omitLastToken): void
     {
         // Clean the keywords
         $searchString = $this->string;
-        if (function_exists('mb_eregi_replace')) {
-            $searchString = mb_eregi_replace('[^[:alnum:] \*\+\'"\.:,_-]|\. |\.$|: |:$|, |,$', ' ', $searchString);
+        if (\function_exists('mb_eregi_replace')) {
+            $searchString = \mb_eregi_replace('[^[:alnum:] \*\+\'"\.:,_-]|\. |\.$|: |:$|, |,$', ' ', $searchString);
         } else {
-            $searchString = preg_replace(
+            $searchString = \preg_replace(
                 array(
                     '/\. /',
                     '/\.$/',
@@ -115,15 +112,15 @@ class SearchStringParser
             );
         }
         // Check keyword string
-        if (!strlen($searchString)) {
+        if (!\strlen($searchString)) {
             throw new \Exception('Empty keyword string');
         }
         // Split keywords
         $chunks = array();
-        preg_match_all('/"[^"]+"|[\+\-]?[^ ]+\*?/', $searchString, $chunks);
+        \preg_match_all('/"[^"]+"|[\+\-]?[^ ]+\*?/', $searchString, $chunks);
 
         if ($omitLastToken) {
-            $this->partial = mb_strtolower(array_pop($chunks[0]));
+            $this->partial = \mb_strtolower(\array_pop($chunks[0]));
         }
         if (empty($chunks)) {
             return;
@@ -134,7 +131,7 @@ class SearchStringParser
         }
 
         if (!$omitLastToken) {
-            $this->partial = mb_strtolower(array_pop($chunks[0]));
+            $this->partial = \mb_strtolower(\array_pop($chunks[0]));
         }
     }
 
@@ -145,11 +142,11 @@ class SearchStringParser
      *
      * @return void
      */
-    private function handleToken($token)
+    private function handleToken(string $token): void
     {
-        $token = trim($token);
+        $token = \trim($token);
 
-        if ($token[0] == '"' && substr($token, -1) == '"') {
+        if ($token[0] === '"' && \str_ends_with($token, '"')) {
             $this->addLiteralToken(substr($token, 1, -1));
             return;
         }
@@ -173,9 +170,9 @@ class SearchStringParser
      *
      * @return void
      */
-    private function addLiteralToken($token)
+    private function addLiteralToken(string $token): void
     {
-        $value = trim($token);
+        $value = \trim($token);
 
         if (empty($value)) {
             return;
@@ -183,7 +180,7 @@ class SearchStringParser
 
         $this->literal[$value] = $value;
 
-        foreach (explode(' ', $value) as $subToken) {
+        foreach (\explode(' ', $value) as $subToken) {
             $this->addMustToken($subToken);
         }
     }
@@ -195,9 +192,9 @@ class SearchStringParser
      *
      * @return void
      */
-    private function addKeywordToken($token)
+    private function addKeywordToken(string $token): void
     {
-        $value = mb_strtolower(trim($token));
+        $value = \mb_strtolower(\trim($token));
 
         if (empty($value)) {
             return;
@@ -213,9 +210,9 @@ class SearchStringParser
      *
      * @return void
      */
-    private function addMustToken($token)
+    private function addMustToken(string $token): void
     {
-        $value = mb_strtolower(trim($token));
+        $value = \mb_strtolower(\trim($token));
 
         if (empty($value)) {
             return;
@@ -233,9 +230,9 @@ class SearchStringParser
      *
      * @return void
      */
-    private function addMustNotToken($token)
+    private function addMustNotToken(string $token): void
     {
-        $value = mb_strtolower(trim($token));
+        $value = \mb_strtolower(\trim($token));
 
         if (empty($value)) {
             return;
@@ -248,7 +245,6 @@ class SearchStringParser
      * Retrieve all keywords.
      *
      * @param int $minLength The minimum length for keywords.
-     *
      * @param int $maxLength The maximum length for keywords.
      *
      * @return \string[]
@@ -256,15 +252,15 @@ class SearchStringParser
     public function getKeywords($minLength = 0, $maxLength = 0)
     {
         if (0 === $minLength && 0 === $maxLength) {
-            return array_values($this->keyword);
+            return \array_values($this->keyword);
         }
 
-        $values = array();
+        $values = [];
         foreach ($this->keyword as $keyword) {
-            if (0 !== $minLength && strlen($keyword) < $minLength) {
+            if (0 !== $minLength && \strlen($keyword) < $minLength) {
                 continue;
             }
-            if (0 !== $maxLength && strlen($keyword) > $maxLength) {
+            if (0 !== $maxLength && \strlen($keyword) > $maxLength) {
                 continue;
             }
 
@@ -278,7 +274,6 @@ class SearchStringParser
      * Retrieve all MUST NOT keywords.
      *
      * @param int $minLength The minimum length for keywords.
-     *
      * @param int $maxLength The maximum length for keywords.
      *
      * @return \string[]
@@ -286,15 +281,15 @@ class SearchStringParser
     public function getMustNot($minLength = 0, $maxLength = 0)
     {
         if (0 === $minLength && 0 === $maxLength) {
-            return array_values($this->mustNot);
+            return \array_values($this->mustNot);
         }
 
         $values = array();
         foreach ($this->mustNot as $keyword) {
-            if (0 !== $minLength && strlen($keyword) < $minLength) {
+            if (0 !== $minLength && \strlen($keyword) < $minLength) {
                 continue;
             }
-            if (0 !== $maxLength && strlen($keyword) > $maxLength) {
+            if (0 !== $maxLength && \strlen($keyword) > $maxLength) {
                 continue;
             }
 
@@ -308,7 +303,6 @@ class SearchStringParser
      * Retrieve all MUST keywords.
      *
      * @param int $minLength The minimum length for keywords.
-     *
      * @param int $maxLength The maximum length for keywords.
      *
      * @return \string[]
@@ -316,15 +310,15 @@ class SearchStringParser
     public function getMust($minLength = 0, $maxLength = 0)
     {
         if (0 === $minLength && 0 === $maxLength) {
-            return array_values($this->must);
+            return \array_values($this->must);
         }
 
-        $values = array();
+        $values = [];
         foreach ($this->must as $keyword) {
-            if (0 !== $minLength && strlen($keyword) < $minLength) {
+            if (0 !== $minLength && \strlen($keyword) < $minLength) {
                 continue;
             }
-            if (0 !== $maxLength && strlen($keyword) > $maxLength) {
+            if (0 !== $maxLength && \strlen($keyword) > $maxLength) {
                 continue;
             }
 
@@ -343,7 +337,7 @@ class SearchStringParser
      */
     public function isMustNot($word)
     {
-        return isset($this->mustNot[mb_strtolower(trim($word))]);
+        return isset($this->mustNot[\mb_strtolower(\trim($word))]);
     }
 
     /**
@@ -353,7 +347,7 @@ class SearchStringParser
      */
     public function getLiterals()
     {
-        return array_values($this->literal);
+        return \array_values($this->literal);
     }
 
     /**

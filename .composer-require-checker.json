@@ -1,0 +1,24 @@
+{
+  "symbol-whitelist": [
+    "array", "bool", "false", "int", "null", "self", "static", "parent", "string", "true", "void", "mixed",
+    "mb_detect_encoding", "mb_eregi_replace", "mb_strtolower",
+    "Contao\\ManagerBundle\\ContaoManagerBundle",
+    "Contao\\ManagerPlugin\\Bundle\\BundlePluginInterface",
+    "Contao\\ManagerPlugin\\Bundle\\Config\\BundleConfig",
+    "Contao\\ManagerPlugin\\Bundle\\Parser\\ParserInterface",
+    "Contao\\ManagerPlugin\\Routing\\RoutingPluginInterface",
+    "Doctrine\\Bundle\\DoctrineBundle\\DoctrineBundle",
+    "ContaoCommunityAlliance\\Contao\\Bindings\\ContaoEvents",
+    "ContaoCommunityAlliance\\Contao\\Bindings\\Events\\System\\GetReferrerEvent",
+    "Doctrine\\DBAL\\ArrayParameterType",
+    "Doctrine\\DBAL\\Connection",
+    "Doctrine\\DBAL\\Result",
+    "MetaModels\\AttributeLevenshteinBundle\\Controller\\Frontend\\ITranslatedMetaModel",
+    "Symfony\\Component\\Config\\FileLocator",
+    "Symfony\\Component\\Config\\Loader\\LoaderResolverInterface",
+    "Symfony\\Component\\HttpFoundation\\JsonResponse",
+    "Symfony\\Component\\HttpFoundation\\Request",
+    "Symfony\\Component\\String\\UnicodeString",
+    "tl_user_group"
+  ]
+}
