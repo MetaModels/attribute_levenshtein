@@ -97,7 +97,7 @@ class AjaxSearch
 
         return new JsonResponse(
             \array_map(
-                static function ($word) {
+                static function (string $word) {
                     return ['value' => $word, 'label' => $word];
                 },
                 $suggestions

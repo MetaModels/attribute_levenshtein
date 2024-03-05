@@ -31,6 +31,8 @@ use MetaModels\Attribute\IAttribute;
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
  *
+ * @psalm-suppress PropertyNotSetInConstructor
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AttributeLevenshtein extends BaseComplex
@@ -137,13 +139,13 @@ class AttributeLevenshtein extends BaseComplex
     public function getDataFor($arrIds)
     {
         // No op - this attribute is not meant to be manipulated.
-        return null;
+        return [];
     }
 
     /**
      * This method is a no-op in this class.
      *
-     * @param mixed[int] $values Unused.
+     * @param array<string, mixed> $arrValues Unused.
      *
      * @return void
      *
@@ -158,7 +160,7 @@ class AttributeLevenshtein extends BaseComplex
     /**
      * Delete all values for the given items.
      *
-     * @param int[] $arrIds The ids of the items to remove votes for.
+     * @param list<string> $arrIds The ids of the items to remove votes for.
      *
      * @return void
      *
@@ -176,7 +178,7 @@ class AttributeLevenshtein extends BaseComplex
      *
      * @param string $strPattern The search pattern to search.
      *
-     * @return string[]|null The list of item ids of all items matching the condition or null if all match.
+     * @return list<string> The list of item ids of all items matching the condition or null if all match.
      */
     public function searchFor($strPattern)
     {

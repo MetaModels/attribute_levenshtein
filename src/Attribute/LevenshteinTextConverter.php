@@ -44,7 +44,6 @@ class LevenshteinTextConverter
      * Create a new instance.
      *
      * @param Blacklist $blacklist The list of forbidden words.
-     *
      * @param string    $language  The language code we are working on.
      */
     public function __construct(Blacklist $blacklist, $language)

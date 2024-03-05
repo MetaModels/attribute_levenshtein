@@ -34,7 +34,7 @@ class LevenstheinSearchRule extends FilterRule
      *
      * @var AttributeLevenshtein
      */
-    protected $attribute = null;
+    protected $attribute;
 
     /**
      * The value to search for.
@@ -47,7 +47,6 @@ class LevenstheinSearchRule extends FilterRule
      * Creates an instance of a simple query filter rule.
      *
      * @param AttributeLevenshtein $attribute The attribute to be searched.
-     *
      * @param string               $value     The value to be searched for. Wildcards (* and ? allowed).
      */
     public function __construct($attribute, $value = '')

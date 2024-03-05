@@ -58,7 +58,7 @@ class LevenshteinSearchSetting extends SimpleLookup
     /**
      * Retrieve the filter parameter name to react on.
      *
-     * @return string
+     * @return string|null
      */
     protected function getParamName()
     {

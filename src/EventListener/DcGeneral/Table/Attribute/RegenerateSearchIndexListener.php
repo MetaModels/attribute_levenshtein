@@ -141,7 +141,7 @@ class RegenerateSearchIndexListener extends AbstractListener
             $languages = $metaModel->isTranslated(false)
                 ? $metaModel->getAvailableLanguages()
                 : [$languageBackup];
-            foreach ($languages as $language) {
+            foreach ($languages ?? [] as $language) {
                 // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
                 $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($language);
                 foreach ($metaModel->findByFilter(null) as $item) {

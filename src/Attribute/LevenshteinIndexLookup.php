@@ -74,13 +74,13 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Connection         $connection    The connection instance to use.
-     * @param IAttribute[]       $attributeList The list of valid attributes.
-     * @param string             $language      The language key.
-     * @param string             $pattern       The pattern to search.
-     * @param array<string, int> $maxDistance   The maximum allowed levenshtein distance.
-     * @param int                $minLength     The minimum length of words.
-     * @param int                $maxLength     The maximum length of words.
+     * @param Connection      $connection    The connection instance to use.
+     * @param IAttribute[]    $attributeList The list of valid attributes.
+     * @param string          $language      The language key.
+     * @param string          $pattern       The pattern to search.
+     * @param array<int, int> $maxDistance   The maximum allowed levenshtein distance.
+     * @param int             $minLength     The minimum length of words.
+     * @param int             $maxLength     The maximum length of words.
      *
      * @return string[]
      */
@@ -101,11 +101,11 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Connection   $connection    The database connection.
-     * @param IAttribute[] $attributeList The list of valid attributes.
-     * @param int[]        $maxDistance   The maximum allowed levenshtein distance.
-     * @param int          $minLength     The minimum length of words.
-     * @param int          $maxLength     The maximum length of words.
+     * @param Connection      $connection    The database connection.
+     * @param IAttribute[]    $attributeList The list of valid attributes.
+     * @param array<int, int> $maxDistance   The maximum allowed levenshtein distance.
+     * @param int             $minLength     The minimum length of words.
+     * @param int             $maxLength     The maximum length of words.
      */
     public function __construct(
         Connection $connection,
@@ -127,7 +127,7 @@ class LevenshteinIndexLookup
      * @param string $language The language key.
      * @param string $pattern  The pattern to search.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function search(string $language, string $pattern): array
     {
@@ -201,7 +201,7 @@ class LevenshteinIndexLookup
      * @param string             $language The language key.
      * @param SearchStringParser $parser   The parser to use.
      *
-     * @return string[]|null
+     * @return list<string>
      */
     private function searchInternal(string $language, SearchStringParser $parser): ?array
     {
