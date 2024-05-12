@@ -53,7 +53,7 @@ class LevenshteinIndexLookup
     /**
      * The maximum allowed levenshtein distance.
      *
-     * @var array<string, int>
+     * @var array<int, int>
      */
     private array $maxDistance;
 
@@ -82,7 +82,7 @@ class LevenshteinIndexLookup
      * @param int             $minLength     The minimum length of words.
      * @param int             $maxLength     The maximum length of words.
      *
-     * @return string[]
+     * @return list<string>
      */
     public static function filter(
         Connection $connection,
@@ -203,7 +203,7 @@ class LevenshteinIndexLookup
      *
      * @return list<string>
      */
-    private function searchInternal(string $language, SearchStringParser $parser): ?array
+    private function searchInternal(string $language, SearchStringParser $parser): array
     {
         $results = new ResultSet();
 
@@ -325,7 +325,7 @@ class LevenshteinIndexLookup
 
             if ($statement->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
-                    $resultSet->addResult($word, $attribute, 0);
+                    $resultSet->addResult($word, $attribute, '0');
                 }
             }
 
@@ -381,7 +381,7 @@ class LevenshteinIndexLookup
             // If no matches, add an empty array.
             if ($statement->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
-                    $resultSet->addMustResult($word, $attribute, 0);
+                    $resultSet->addMustResult($word, $attribute, '0');
                 }
                 continue;
             }

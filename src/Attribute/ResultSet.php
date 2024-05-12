@@ -42,7 +42,7 @@ class ResultSet
      *
      * @var array[]
      */
-    private array $mustResults;
+    private array $mustResults = [];
 
     /**
      * The list of results tha must not be returned.

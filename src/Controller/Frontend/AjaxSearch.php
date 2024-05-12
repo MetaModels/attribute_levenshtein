@@ -83,7 +83,7 @@ class AjaxSearch
             // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
             $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag((string) $language);
             if ($metaModel instanceof ITranslatedMetaModel) {
-                $metaModel->selectLanguage(LocaleUtil::formatAsLocale($language));
+                $metaModel->selectLanguage(LocaleUtil::formatAsLocale((string) $language));
             }
         }
 
@@ -93,14 +93,14 @@ class AjaxSearch
         }
 
         /** @var AttributeLevenshtein $attribute */
-        $suggestions = $attribute->getSuggestions($search);
+        $suggestions = $attribute->getSuggestions((string) $search);
 
         return new JsonResponse(
             \array_map(
                 static function (string $word) {
                     return ['value' => $word, 'label' => $word];
                 },
-                $suggestions
+                $suggestions ?? []
             )
         );
     }

@@ -36,7 +36,7 @@ class WordList
     /**
      * The list of words.
      *
-     * @var array<string,int>
+     * @var array<string, int>
      */
     private array $words;
 
@@ -50,8 +50,8 @@ class WordList
     /**
      * Create a new instance.
      *
-     * @param string            $language The language code.
-     * @param array<string,int> $words    The list of words (key is the word, value the relevance).
+     * @param string             $language The language code.
+     * @param array<string, int> $words    The list of words (key is the word, value the relevance).
      */
     public function __construct($language, $words)
     {
@@ -76,7 +76,7 @@ class WordList
     /**
      * Retrieve the word list as associative array (key == word, value == relevance).
      *
-     * @return array<string,int>
+     * @return array<string, int>
      */
     public function getWords()
     {

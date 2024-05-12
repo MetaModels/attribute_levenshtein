@@ -36,7 +36,7 @@ class Blacklist
     /**
      * The list of words.
      *
-     * @var array<string,string>
+     * @var array<string, string>
      */
     private array $words = [];
 
@@ -95,7 +95,7 @@ class Blacklist
      *
      * @param WordList $list The list to filter.
      *
-     * @return array<string,int>
+     * @return array<string, string>
      */
     public function filter(WordList $list)
     {

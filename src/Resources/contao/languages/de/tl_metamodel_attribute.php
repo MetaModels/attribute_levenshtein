@@ -31,6 +31,6 @@ $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance']['0']      
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance']['1']            = 'Bitte wählen Sie für jede Mindestwortlänge den maximalen Abstand für den Levenshtein-Algorithmus.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance_distance']['0']   = 'Erlaubter Abstand';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance_wordlength']['0'] = 'Minimale Wortlänge';
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein']                  = 'Suchindex neu aufbauen.';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein'][0]               = 'Suchindex neu aufbauen.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['typeOptions']['levensthein']           = 'Levenshtein-gestützte Suche';
 

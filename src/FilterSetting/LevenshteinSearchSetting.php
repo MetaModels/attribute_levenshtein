@@ -67,7 +67,7 @@ class LevenshteinSearchSetting extends SimpleLookup
         }
 
         $objAttribute = $this->getMetaModel()->getAttributeById((int) $this->get('attr_id'));
-        if ($objAttribute) {
+        if ($objAttribute instanceof IAttribute) {
             return $objAttribute->getColName();
         }
 
@@ -84,7 +84,7 @@ class LevenshteinSearchSetting extends SimpleLookup
         $metaModel = $this->getMetaModel();
         $attribute = $metaModel->getAttributeById((int) $this->get('attr_id'));
         $paramName = $this->getParamName();
-        $value     = $filterUrl[$paramName] ?? '';
+        $value     = $arrFilterUrl[$paramName] ?? '';
 
         if ($attribute && $paramName && $value) {
             /** @var AttributeLevenshtein $attribute */
@@ -92,7 +92,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             return;
         }
 
-        $objFilter->addFilterRule(new StaticIdList(null));
+        $objFilter->addFilterRule(new StaticIdList([]));
     }
 
     /**
@@ -139,7 +139,10 @@ class LevenshteinSearchSetting extends SimpleLookup
             return [];
         }
 
-        $this->addFilterParam($this->getParamName());
+        $paramName = $this->getParamName();
+        assert(\is_string($paramName));
+
+        $this->addFilterParam($paramName);
         $arrReturn = [];
         $attrId    = $this->get('attr_id');
         $cssID     = StringUtil::deserialize($this->get('cssID'), true);
@@ -151,14 +154,14 @@ class LevenshteinSearchSetting extends SimpleLookup
         $arrWidget = [
             'label'     => [
                 $this->getLabel(),
-                'GET: ' . $this->getParamName()
+                'GET: ' . $paramName
             ],
             'inputType' => 'text',
             'count'     => [],
             'showCount' => $objFrontendFilterOptions->isShowCountValues(),
             'eval'      => [
                 'colname'      => $attribute->getColName(),
-                'urlparam'     => $this->getParamName(),
+                'urlparam'     => $paramName,
                 'template'     => $this->get('template'),
                 'hide_label'   => $this->get('hide_label'),
                 'cssID'        => \sprintf(
@@ -177,7 +180,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             ]
         ];
 
-        $arrReturn[$this->getParamName()] =
+        $arrReturn[$paramName] =
             $this->prepareFrontendFilterWidget($arrWidget, $arrFilterUrl, $arrJumpTo, $objFrontendFilterOptions);
 
         return $arrReturn;

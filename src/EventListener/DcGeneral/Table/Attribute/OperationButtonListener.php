@@ -62,10 +62,10 @@ class OperationButtonListener extends AbstractListener
      */
     protected function wantToHandle(AbstractEnvironmentAwareEvent $event)
     {
+        /** @var GetOperationButtonEvent $event */
         $command = $event->getCommand();
         assert($command instanceof CommandInterface);
 
-        /** @var GetOperationButtonEvent $event */
         return parent::wantToHandle($event)
                && 'rebuild_levensthein' === $command->getName();
     }

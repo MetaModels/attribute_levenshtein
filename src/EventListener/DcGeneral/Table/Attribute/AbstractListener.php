@@ -73,10 +73,6 @@ abstract class AbstractListener extends AbstractAbstainingListener
      */
     protected function getMetaModel($metaModelId)
     {
-        if (null === $this->factory) {
-            throw new \RuntimeException('No factory set.');
-        }
-
         $metaModelName = $this->factory->translateIdToMetaModelName($metaModelId);
 
         return $this->factory->getMetaModel($metaModelName);
