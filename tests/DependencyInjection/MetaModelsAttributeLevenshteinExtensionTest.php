@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2021 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,8 +14,9 @@
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2021 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2024 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -33,6 +34,8 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  * This test case test the extension.
  *
  * @covers \MetaModels\AttributeLevenshteinBundle\DependencyInjection\MetaModelsAttributeLevenshteinExtension
+ *
+ * @SuppressWarnings(PHPMD.LongClassName)
  */
 class MetaModelsAttributeLevenshteinExtensionTest extends TestCase
 {
@@ -56,41 +59,17 @@ class MetaModelsAttributeLevenshteinExtensionTest extends TestCase
      */
     public function testFactoryIsRegistered()
     {
-        $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
-
-        $container
-            ->expects(self::atLeast(2))
-            ->method('setDefinition')
-            ->withConsecutive(
-                [
-                    'metamodels.attribute_levenshtein.attribute_factory',
-                    self::callback(
-                        function ($value) {
-                            /** @var Definition $value */
-                            $this->assertInstanceOf(Definition::class, $value);
-                            $this->assertEquals(LevenshteinAttributeTypeFactory::class, $value->getClass());
-                            $this->assertCount(1, $value->getTag('metamodels.attribute_factory'));
-
-                            return true;
-                        }
-                    )
-                ],
-                [
-                    'metamodels.attribute_levenshtein.filter_factory',
-                    self::callback(
-                        function ($value) {
-                            /** @var Definition $value */
-                            $this->assertInstanceOf(Definition::class, $value);
-                            $this->assertEquals(LevenshteinFilterSettingTypeFactory::class, $value->getClass());
-                            $this->assertCount(1, $value->getTag('metamodels.filter_factory'));
-
-                            return true;
-                        }
-                    )
-                ]
-            );
+        $container = new ContainerBuilder();
 
         $extension = new MetaModelsAttributeLevenshteinExtension();
         $extension->load([], $container);
+
+        self::assertTrue($container->hasDefinition('metamodels.attribute_levenshtein.attribute_factory'));
+        $definition = $container->getDefinition('metamodels.attribute_levenshtein.attribute_factory');
+        self::assertCount(1, $definition->getTag('metamodels.attribute_factory'));
+
+        self::assertTrue($container->hasDefinition('metamodels.attribute_levenshtein.filter_factory'));
+        $definition = $container->getDefinition('metamodels.attribute_levenshtein.filter_factory');
+        self::assertCount(1, $definition->getTag('metamodels.filter_factory'));
     }
 }

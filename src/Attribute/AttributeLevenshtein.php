@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,7 @@
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -30,22 +30,26 @@ use MetaModels\Attribute\IAttribute;
 
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AttributeLevenshtein extends BaseComplex
 {
     /**
      * The index to work with.
      *
-     * @var LevenshteinIndex
+     * @var LevenshteinIndex|null
      */
-    private LevenshteinIndex $index;
+    private ?LevenshteinIndex $index = null;
 
     /**
      * The index to work with.
      *
-     * @var LevenshteinIndexLookup
+     * @var LevenshteinIndexLookup|null
      */
-    private LevenshteinIndexLookup $indexLookup;
+    private ?LevenshteinIndexLookup $indexLookup = null;
 
     /**
      * Database connection.
@@ -80,8 +84,8 @@ class AttributeLevenshtein extends BaseComplex
             );
             // @codingStandardsIgnoreEnd
             $connection = System::getContainer()->get('database_connection');
+            assert($connection instanceof Connection);
         }
-
         $this->connection = $connection;
     }
 
@@ -120,7 +124,7 @@ class AttributeLevenshtein extends BaseComplex
      *
      * @codeCoverageIgnore
      */
-    public function getFilterOptions($idList, $usedOnly, &$count = null)
+    public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
         return [];
     }
@@ -132,23 +136,23 @@ class AttributeLevenshtein extends BaseComplex
      *
      * @codeCoverageIgnore
      */
-    public function getDataFor($idList)
+    public function getDataFor($arrIds)
     {
         // No op - this attribute is not meant to be manipulated.
-        return null;
+        return [];
     }
 
     /**
      * This method is a no-op in this class.
      *
-     * @param mixed[int] $values Unused.
+     * @param array<string, mixed> $arrValues Unused.
      *
      * @return void
      *
      * @SuppressWarnings("unused")
      * @codeCoverageIgnore
      */
-    public function setDataFor($values)
+    public function setDataFor($arrValues)
     {
         // No op - this attribute is not meant to be manipulated.
     }
@@ -156,13 +160,13 @@ class AttributeLevenshtein extends BaseComplex
     /**
      * Delete all values for the given items.
      *
-     * @param int[] $idList The ids of the items to remove votes for.
+     * @param list<string> $arrIds The ids of the items to remove votes for.
      *
      * @return void
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function unsetDataFor($idList)
+    public function unsetDataFor($arrIds)
     {
         // No op - this attribute is not meant to be manipulated.
     }
@@ -172,36 +176,36 @@ class AttributeLevenshtein extends BaseComplex
      *
      * The standard wildcards * (many characters) and ? (a single character) are supported.
      *
-     * @param string $pattern The search pattern to search.
+     * @param string $strPattern The search pattern to search.
      *
-     * @return string[]|null The list of item ids of all items matching the condition or null if all match.
+     * @return list<string> The list of item ids of all items matching the condition or null if all match.
      */
-    public function searchFor($pattern)
+    public function searchFor($strPattern)
     {
-        $index = $this->getLookup();
-
-        return $index->search(
+        /** @psalm-suppress DeprecatedMethod */
+        return $this->getLookup()->search(
             $this->getMetaModel()->getActiveLanguage(),
-            $pattern
+            $strPattern
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function modelSaved($item)
+    public function modelSaved($objItem)
     {
         $indexer   = $this->getIndex();
         $blacklist = $this->getBlackList();
         $metaModel = $this->getMetaModel();
-        $language  = $metaModel->getActiveLanguage();
+        /** @psalm-suppress DeprecatedMethod */
+        $language = $metaModel->getActiveLanguage();
         // Parse the value as text representation for each attribute.
         foreach ($this->getIndexedAttributes() as $attribute) {
-            $value = $item->parseAttribute($attribute->getColName());
+            $value = $objItem->parseAttribute($attribute->getColName());
             $indexer->updateIndex(
                 $value['text'],
                 $attribute,
-                $item->get('id'),
+                $objItem->get('id'),
                 $language,
                 $blacklist
             );
@@ -219,9 +223,8 @@ class AttributeLevenshtein extends BaseComplex
      */
     public function getSuggestions($pattern)
     {
-        $index = $this->getLookup();
-
-        return $index->getSuggestions(
+        /** @psalm-suppress DeprecatedMethod */
+        return $this->getLookup()->getSuggestions(
             $this->getMetaModel()->getActiveLanguage(),
             $pattern
         );
@@ -230,7 +233,7 @@ class AttributeLevenshtein extends BaseComplex
     /**
      * Retrieve the list of attributes we index.
      *
-     * @return IAttribute[]
+     * @return list<IAttribute>
      */
     private function getIndexedAttributes(): array
     {
@@ -242,9 +245,8 @@ class AttributeLevenshtein extends BaseComplex
         $attributes = [];
         foreach ($attributeNames as $attributeName) {
             $attribute = $metaModel->getAttribute($attributeName);
-            if ($attribute) {
-                $attributes[] = $attribute;
-            }
+            assert($attribute instanceof IAttribute);
+            $attributes[] = $attribute;
         }
 
         return $attributes;
@@ -257,7 +259,7 @@ class AttributeLevenshtein extends BaseComplex
      */
     private function getIndex(): LevenshteinIndex
     {
-        if (!isset($this->index)) {
+        if (null === $this->index) {
             $this->index = new LevenshteinIndex($this->connection);
         }
 
@@ -271,7 +273,7 @@ class AttributeLevenshtein extends BaseComplex
      */
     private function getLookup(): LevenshteinIndexLookup
     {
-        if (!isset($this->indexLookup)) {
+        if (null === $this->indexLookup) {
             $this->indexLookup = new LevenshteinIndexLookup(
                 $this->connection,
                 $this->getIndexedAttributes(),

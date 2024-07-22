@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2023 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Oliver Willmes <info@oliverwillmes.de>
- * @copyright  2012-2023 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -31,6 +31,8 @@ use Symfony\Component\String\UnicodeString;
 
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class LevenshteinIndexLookup
 {
@@ -51,7 +53,7 @@ class LevenshteinIndexLookup
     /**
      * The maximum allowed levenshtein distance.
      *
-     * @var array<string, int>
+     * @var array<int, int>
      */
     private array $maxDistance;
 
@@ -72,15 +74,15 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Connection         $connection    The connection instance to use.
-     * @param IAttribute[]       $attributeList The list of valid attributes.
-     * @param string             $language      The language key.
-     * @param string             $pattern       The pattern to search.
-     * @param array<string, int> $maxDistance   The maximum allowed levenshtein distance.
-     * @param int                $minLength     The minimum length of words.
-     * @param int                $maxLength     The maximum length of words.
+     * @param Connection       $connection    The connection instance to use.
+     * @param list<IAttribute> $attributeList The list of valid attributes.
+     * @param string           $language      The language key.
+     * @param string           $pattern       The pattern to search.
+     * @param array<int, int>  $maxDistance   The maximum allowed levenshtein distance.
+     * @param int              $minLength     The minimum length of words.
+     * @param int              $maxLength     The maximum length of words.
      *
-     * @return string[]
+     * @return list<string>
      */
     public static function filter(
         Connection $connection,
@@ -91,7 +93,7 @@ class LevenshteinIndexLookup
         int $minLength = 3,
         int $maxLength = 20
     ): array {
-        $instance = new static($connection, $attributeList, $maxDistance, $minLength, $maxLength);
+        $instance = new self($connection, $attributeList, $maxDistance, $minLength, $maxLength);
 
         return $instance->search($language, $pattern);
     }
@@ -99,11 +101,11 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Connection   $connection    The database connection.
-     * @param IAttribute[] $attributeList The list of valid attributes.
-     * @param int[]        $maxDistance   The maximum allowed levenshtein distance.
-     * @param int          $minLength     The minimum length of words.
-     * @param int          $maxLength     The maximum length of words.
+     * @param Connection       $connection    The database connection.
+     * @param list<IAttribute> $attributeList The list of valid attributes.
+     * @param array<int, int>  $maxDistance   The maximum allowed levenshtein distance.
+     * @param int              $minLength     The minimum length of words.
+     * @param int              $maxLength     The maximum length of words.
      */
     public function __construct(
         Connection $connection,
@@ -125,7 +127,7 @@ class LevenshteinIndexLookup
      * @param string $language The language key.
      * @param string $pattern  The pattern to search.
      *
-     * @return string[]
+     * @return list<string>
      */
     public function search(string $language, string $pattern): array
     {
@@ -199,9 +201,9 @@ class LevenshteinIndexLookup
      * @param string             $language The language key.
      * @param SearchStringParser $parser   The parser to use.
      *
-     * @return string[]|null
+     * @return list<string>
      */
-    private function searchInternal(string $language, SearchStringParser $parser): ?array
+    private function searchInternal(string $language, SearchStringParser $parser): array
     {
         $results = new ResultSet();
 
@@ -225,13 +227,13 @@ class LevenshteinIndexLookup
         $items = \array_filter($results->getCombinedResults($this->attributeList));
 
         if ($items) {
-            return $items;
+            return \array_values($items);
         }
 
         // Try via levenshtein now.
         $this->getLevenshteinCandidates($attributeIds, $parser, $results);
 
-        return \array_filter($results->getCombinedResults($this->attributeList));
+        return \array_values(\array_filter($results->getCombinedResults($this->attributeList)));
     }
 
     /**
@@ -249,7 +251,7 @@ class LevenshteinIndexLookup
         foreach ($literals as $literal) {
             foreach ($this->attributeList as $attribute) {
                 if ($attribute instanceof ITranslated) {
-                    $results = $attribute->searchForInLanguages('*' . $literal . '*', [$language]);
+                    $results = $attribute->searchForInLanguages('*' . $literal . '*', [$language ?: 'en']);
                 } else {
                     $results = $attribute->searchFor('*' . $literal . '*');
                 }
@@ -284,7 +286,7 @@ class LevenshteinIndexLookup
         SearchStringParser $parser,
         ResultSet $resultSet
     ): void {
-        if ($parser->getKeywords() == []) {
+        if ($parser->getKeywords() === []) {
             return;
         }
 
@@ -323,7 +325,7 @@ class LevenshteinIndexLookup
 
             if ($statement->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
-                    $resultSet->addResult($word, $attribute, 0);
+                    $resultSet->addResult($word, $attribute, '0');
                 }
             }
 
@@ -372,18 +374,19 @@ class LevenshteinIndexLookup
         );
 
         foreach ($must as $word) {
-            $query = $this->connection->prepare($sql);
-            $query->execute(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
+            $query     = $this->connection->prepare($sql);
+            $statement =
+                $query->executeQuery(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
 
             // If no matches, add an empty array.
-            if ($query->rowCount() === 0) {
+            if ($statement->rowCount() === 0) {
                 foreach ($attributeIds as $attribute) {
-                    $resultSet->addMustResult($word, $attribute, 0);
+                    $resultSet->addMustResult($word, $attribute, '0');
                 }
                 continue;
             }
 
-            while ($row = $query->fetchAssociative()) {
+            while ($row = $statement->fetchAssociative()) {
                 if (!empty($row['attribute']) && !empty($row['item'])) {
                     $resultSet->addMustResult($word, $row['attribute'], $row['item']);
                 }
@@ -428,10 +431,11 @@ class LevenshteinIndexLookup
         );
 
         foreach ($must as $word) {
-            $query = $this->connection->prepare($sql);
-            $query->execute(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
+            $query     = $this->connection->prepare($sql);
+            $statement =
+                $query->executeQuery(\array_merge($parameters, [$this->normalizeWord($word), $word], $attributeIds));
 
-            while ($row = $query->fetchAssociative()) {
+            while ($row = $statement->fetchAssociative()) {
                 if (!empty($row['attribute']) && !empty($row['item'])) {
                     $resultSet->addNegativeResult($word, $row['attribute'], $row['item']);
                 }
@@ -533,7 +537,7 @@ class LevenshteinIndexLookup
                 break;
             }
 
-            $distance = (int) $allowedDistance;
+            $distance = $allowedDistance;
         }
 
         return $distance;
@@ -579,7 +583,7 @@ class LevenshteinIndexLookup
      */
     private function normalizeWord(string $word): string
     {
-        if (\mb_detect_encoding($word) == 'ASCII') {
+        if (\mb_detect_encoding($word) === 'ASCII') {
             return $word;
         }
 

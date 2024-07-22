@@ -1,27 +1,25 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MetaModels/attribute_levensthein
+ * @package    MetaModels/attribute_levenshtein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @copyright  2012-2024 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
-
-use Symfony\Component\String\UnicodeString;
 
 /**
  * This class is used to convert a text into a word list to be used in a search index.
@@ -33,20 +31,19 @@ class LevenshteinTextConverter
      *
      * @var Blacklist
      */
-    private $blacklist;
+    private Blacklist $blacklist;
 
     /**
      * The language code we are working on.
      *
      * @var string
      */
-    private $language;
+    private string $language;
 
     /**
      * Create a new instance.
      *
      * @param Blacklist $blacklist The list of forbidden words.
-     *
      * @param string    $language  The language code we are working on.
      */
     public function __construct(Blacklist $blacklist, $language)
@@ -72,32 +69,33 @@ class LevenshteinTextConverter
      *
      * @param string $text The text to prepare.
      *
-     * @return string[]
+     * @return list<string>
      */
     private function sanitizeText($text)
     {
-        $content = str_replace(
-            array("\n", "\r", "\t", '&#160;', '&nbsp;', '&shy;'),
-            array(' ', ' ', ' ', ' ', ' ', ''),
+        $content = \str_replace(
+            ["\n", "\r", "\t", '&#160;', '&nbsp;', '&shy;'],
+            [' ', ' ', ' ', ' ', ' ', ''],
             $text
         );
 
         // Remove quotes
-        $content = str_replace(array('´', '`'), "'", $content);
-        $content = mb_eregi_replace('[^[:alnum:]\'\.:,\+_-]|- | -|\' | \'|\. |\.$|: |:$|, |,$', ' ', $content);
-        return preg_split('/ +/', mb_strtolower($content));
+        $content = \str_replace(['´', '`'], "'", $content);
+        $content = \mb_eregi_replace('[^[:alnum:]\'\.:,\+_-]|- | -|\' | \'|\. |\.$|: |:$|, |,$', ' ', $content);
+
+        return \preg_split('/ +/', \mb_strtolower($content ?? ''));
     }
 
     /**
      * Filter the passed word list against the blacklist and trim all words from inter punctuation.
      *
-     * @param string[] $words The words to filter.
+     * @param list<string> $words The words to filter.
      *
-     * @return int[string]
+     * @return array<string, int>
      */
-    private function filterWords($words)
+    private function filterWords(array $words): array
     {
-        $list = array();
+        $list = [];
         foreach ($words as $word) {
             $word = $this->convertWord($word);
 
@@ -126,18 +124,18 @@ class LevenshteinTextConverter
     private function convertWord($word)
     {
         // Strip a leading plus.
-        if (strncmp($word, '+', 1) === 0) {
-            $word = substr($word, 1);
+        if (\strncmp($word, '+', 1) === 0) {
+            $word = \substr($word, 1);
         }
-        $word = trim($word);
-        if (!strlen($word) || preg_match('/^[\.:,\'_-]+$/', $word)) {
+        $word = \trim($word);
+        if (!\strlen($word) || \preg_match('/^[\.:,\'_-]+$/', $word)) {
             return null;
         }
-        if (preg_match('/^[\':,]/', $word)) {
-            $word = substr($word, 1);
+        if (\preg_match('/^[\':,]/', $word)) {
+            $word = \substr($word, 1);
         }
-        if (preg_match('/[\':,\.]$/', $word)) {
-            $word = substr($word, 0, -1);
+        if (\preg_match('/[\':,\.]$/', $word)) {
+            $word = \substr($word, 0, -1);
         }
 
         return $word;

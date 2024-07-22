@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -22,6 +22,7 @@
 namespace MetaModels\AttributeLevenshteinBundle\FilterSetting;
 
 use Contao\StringUtil;
+use MetaModels\Attribute\IAttribute;
 use MetaModels\AttributeLevenshteinBundle\Attribute\AttributeLevenshtein;
 use MetaModels\AttributeLevenshteinBundle\FilterRule\LevenstheinSearchRule;
 use MetaModels\Filter\IFilter;
@@ -57,7 +58,7 @@ class LevenshteinSearchSetting extends SimpleLookup
     /**
      * Retrieve the filter parameter name to react on.
      *
-     * @return string
+     * @return string|null
      */
     protected function getParamName()
     {
@@ -66,7 +67,7 @@ class LevenshteinSearchSetting extends SimpleLookup
         }
 
         $objAttribute = $this->getMetaModel()->getAttributeById((int) $this->get('attr_id'));
-        if ($objAttribute) {
+        if ($objAttribute instanceof IAttribute) {
             return $objAttribute->getColName();
         }
 
@@ -75,21 +76,24 @@ class LevenshteinSearchSetting extends SimpleLookup
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
-    public function prepareRules(IFilter $filter, $filterUrl)
+    public function prepareRules(IFilter $objFilter, $arrFilterUrl)
     {
         $metaModel = $this->getMetaModel();
         $attribute = $metaModel->getAttributeById((int) $this->get('attr_id'));
         $paramName = $this->getParamName();
-        $value     = $filterUrl[$paramName] ?? '';
+        $value     = (string) ($arrFilterUrl[$paramName] ?? '');
 
-        if ($attribute && $paramName && $value) {
+        if (null !== $attribute && null !== $paramName && $value) {
             /** @var AttributeLevenshtein $attribute */
-            $filter->addFilterRule(new LevenstheinSearchRule($attribute, $value));
+            $objFilter->addFilterRule(new LevenstheinSearchRule($attribute, $value));
+
             return;
         }
 
-        $filter->addFilterRule(new StaticIdList(null));
+        $objFilter->addFilterRule(new StaticIdList([]));
     }
 
     /**
@@ -97,7 +101,7 @@ class LevenshteinSearchSetting extends SimpleLookup
      */
     public function getParameters()
     {
-        return ($strParamName = $this->getParamName()) ? [$strParamName] : [];
+        return (null !== ($strParamName = $this->getParamName())) ? [$strParamName] : [];
     }
 
     /**
@@ -105,10 +109,8 @@ class LevenshteinSearchSetting extends SimpleLookup
      */
     public function getParameterFilterNames()
     {
-        if (($strParamName = $this->getParamName())) {
-            return [
-                $strParamName => ($this->getLabel() ? $this->getLabel() : $this->getParamName())
-            ];
+        if ('' !== ($strParamName = $this->getParamName() ?? '')) {
+            return [$strParamName => (((string) $this->getLabel()) ?: $strParamName)];
         }
 
         return [];
@@ -120,6 +122,7 @@ class LevenshteinSearchSetting extends SimpleLookup
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.LongVariable)
      */
     public function getParameterFilterWidgets(
         $arrIds,
@@ -135,25 +138,32 @@ class LevenshteinSearchSetting extends SimpleLookup
             return [];
         }
 
-        $this->addFilterParam($this->getParamName());
+        $paramName = $this->getParamName();
+        assert(\is_string($paramName));
+
+        $this->addFilterParam($paramName);
         $arrReturn = [];
         $attrId    = $this->get('attr_id');
         $cssID     = StringUtil::deserialize($this->get('cssID'), true);
 
+        $attribute = $this->getMetaModel()->getAttributeById((int) $attrId);
+        assert($attribute instanceof IAttribute);
+
+        /** @psalm-suppress DeprecatedMethod */
         $arrWidget = [
             'label'     => [
                 $this->getLabel(),
-                'GET: ' . $this->getParamName()
+                'GET: ' . $paramName
             ],
             'inputType' => 'text',
             'count'     => [],
             'showCount' => $objFrontendFilterOptions->isShowCountValues(),
             'eval'      => [
-                'colname'      => $this->getMetaModel()->getAttributeById((int) $attrId)->getColName(),
-                'urlparam'     => $this->getParamName(),
+                'colname'      => $attribute->getColName(),
+                'urlparam'     => $paramName,
                 'template'     => $this->get('template'),
                 'hide_label'   => $this->get('hide_label'),
-                'cssID'        => sprintf(
+                'cssID'        => \sprintf(
                     ' id="%s"',
                     !empty($cssID[0]) ? $cssID[0] : 'autocomplete__container_' . $attrId
                 ),
@@ -169,7 +179,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             ]
         ];
 
-        $arrReturn[$this->getParamName()] =
+        $arrReturn[$paramName] =
             $this->prepareFrontendFilterWidget($arrWidget, $arrFilterUrl, $arrJumpTo, $objFrontendFilterOptions);
 
         return $arrReturn;
@@ -193,7 +203,7 @@ class LevenshteinSearchSetting extends SimpleLookup
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    private function addFilterParam($strParam)
+    private function addFilterParam(string $strParam): void
     {
         $GLOBALS['MM_FILTER_PARAMS'][] = $strParam;
     }
