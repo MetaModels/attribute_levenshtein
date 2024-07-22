@@ -40,16 +40,16 @@ class AttributeLevenshtein extends BaseComplex
     /**
      * The index to work with.
      *
-     * @var LevenshteinIndex
+     * @var LevenshteinIndex|null
      */
-    private LevenshteinIndex $index;
+    private ?LevenshteinIndex $index = null;
 
     /**
      * The index to work with.
      *
-     * @var LevenshteinIndexLookup
+     * @var LevenshteinIndexLookup|null
      */
-    private LevenshteinIndexLookup $indexLookup;
+    private ?LevenshteinIndexLookup $indexLookup = null;
 
     /**
      * Database connection.
@@ -233,7 +233,7 @@ class AttributeLevenshtein extends BaseComplex
     /**
      * Retrieve the list of attributes we index.
      *
-     * @return IAttribute[]
+     * @return list<IAttribute>
      */
     private function getIndexedAttributes(): array
     {
@@ -244,7 +244,9 @@ class AttributeLevenshtein extends BaseComplex
         $metaModel  = $this->getMetaModel();
         $attributes = [];
         foreach ($attributeNames as $attributeName) {
-            $attributes[] = $metaModel->getAttribute($attributeName);
+            $attribute = $metaModel->getAttribute($attributeName);
+            assert($attribute instanceof IAttribute);
+            $attributes[] = $attribute;
         }
 
         return $attributes;
@@ -257,7 +259,7 @@ class AttributeLevenshtein extends BaseComplex
      */
     private function getIndex(): LevenshteinIndex
     {
-        if (!isset($this->index)) {
+        if (null === $this->index) {
             $this->index = new LevenshteinIndex($this->connection);
         }
 
@@ -271,7 +273,7 @@ class AttributeLevenshtein extends BaseComplex
      */
     private function getLookup(): LevenshteinIndexLookup
     {
-        if (!isset($this->indexLookup)) {
+        if (null === $this->indexLookup) {
             $this->indexLookup = new LevenshteinIndexLookup(
                 $this->connection,
                 $this->getIndexedAttributes(),

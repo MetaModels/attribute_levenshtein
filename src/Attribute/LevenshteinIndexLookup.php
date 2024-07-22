@@ -74,13 +74,13 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Connection      $connection    The connection instance to use.
-     * @param IAttribute[]    $attributeList The list of valid attributes.
-     * @param string          $language      The language key.
-     * @param string          $pattern       The pattern to search.
-     * @param array<int, int> $maxDistance   The maximum allowed levenshtein distance.
-     * @param int             $minLength     The minimum length of words.
-     * @param int             $maxLength     The maximum length of words.
+     * @param Connection       $connection    The connection instance to use.
+     * @param list<IAttribute> $attributeList The list of valid attributes.
+     * @param string           $language      The language key.
+     * @param string           $pattern       The pattern to search.
+     * @param array<int, int>  $maxDistance   The maximum allowed levenshtein distance.
+     * @param int              $minLength     The minimum length of words.
+     * @param int              $maxLength     The maximum length of words.
      *
      * @return list<string>
      */
@@ -93,7 +93,7 @@ class LevenshteinIndexLookup
         int $minLength = 3,
         int $maxLength = 20
     ): array {
-        $instance = new static($connection, $attributeList, $maxDistance, $minLength, $maxLength);
+        $instance = new self($connection, $attributeList, $maxDistance, $minLength, $maxLength);
 
         return $instance->search($language, $pattern);
     }
@@ -101,11 +101,11 @@ class LevenshteinIndexLookup
     /**
      * Create a new instance.
      *
-     * @param Connection      $connection    The database connection.
-     * @param IAttribute[]    $attributeList The list of valid attributes.
-     * @param array<int, int> $maxDistance   The maximum allowed levenshtein distance.
-     * @param int             $minLength     The minimum length of words.
-     * @param int             $maxLength     The maximum length of words.
+     * @param Connection       $connection    The database connection.
+     * @param list<IAttribute> $attributeList The list of valid attributes.
+     * @param array<int, int>  $maxDistance   The maximum allowed levenshtein distance.
+     * @param int              $minLength     The minimum length of words.
+     * @param int              $maxLength     The maximum length of words.
      */
     public function __construct(
         Connection $connection,
@@ -227,13 +227,13 @@ class LevenshteinIndexLookup
         $items = \array_filter($results->getCombinedResults($this->attributeList));
 
         if ($items) {
-            return $items;
+            return \array_values($items);
         }
 
         // Try via levenshtein now.
         $this->getLevenshteinCandidates($attributeIds, $parser, $results);
 
-        return \array_filter($results->getCombinedResults($this->attributeList));
+        return \array_values(\array_filter($results->getCombinedResults($this->attributeList)));
     }
 
     /**
@@ -251,7 +251,7 @@ class LevenshteinIndexLookup
         foreach ($literals as $literal) {
             foreach ($this->attributeList as $attribute) {
                 if ($attribute instanceof ITranslated) {
-                    $results = $attribute->searchForInLanguages('*' . $literal . '*', [$language]);
+                    $results = $attribute->searchForInLanguages('*' . $literal . '*', [$language ?: 'en']);
                 } else {
                     $results = $attribute->searchFor('*' . $literal . '*');
                 }

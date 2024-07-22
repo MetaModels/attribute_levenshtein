@@ -84,11 +84,12 @@ class LevenshteinSearchSetting extends SimpleLookup
         $metaModel = $this->getMetaModel();
         $attribute = $metaModel->getAttributeById((int) $this->get('attr_id'));
         $paramName = $this->getParamName();
-        $value     = $arrFilterUrl[$paramName] ?? '';
+        $value     = (string) ($arrFilterUrl[$paramName] ?? '');
 
-        if ($attribute && $paramName && $value) {
+        if (null !== $attribute && null !== $paramName && $value) {
             /** @var AttributeLevenshtein $attribute */
             $objFilter->addFilterRule(new LevenstheinSearchRule($attribute, $value));
+
             return;
         }
 
@@ -100,7 +101,7 @@ class LevenshteinSearchSetting extends SimpleLookup
      */
     public function getParameters()
     {
-        return ($strParamName = $this->getParamName()) ? [$strParamName] : [];
+        return (null !== ($strParamName = $this->getParamName())) ? [$strParamName] : [];
     }
 
     /**
@@ -108,10 +109,8 @@ class LevenshteinSearchSetting extends SimpleLookup
      */
     public function getParameterFilterNames()
     {
-        if (($strParamName = $this->getParamName())) {
-            return [
-                $strParamName => ($this->getLabel() ?: $this->getParamName())
-            ];
+        if ('' !== ($strParamName = $this->getParamName() ?? '')) {
+            return [$strParamName => (((string) $this->getLabel()) ?: $strParamName)];
         }
 
         return [];

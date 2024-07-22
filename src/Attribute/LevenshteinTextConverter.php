@@ -69,7 +69,7 @@ class LevenshteinTextConverter
      *
      * @param string $text The text to prepare.
      *
-     * @return string[]
+     * @return list<string>
      */
     private function sanitizeText($text)
     {
@@ -89,11 +89,11 @@ class LevenshteinTextConverter
     /**
      * Filter the passed word list against the blacklist and trim all words from inter punctuation.
      *
-     * @param string[] $words The words to filter.
+     * @param list<string> $words The words to filter.
      *
-     * @return string[]
+     * @return array<string, int>
      */
-    private function filterWords($words)
+    private function filterWords(array $words): array
     {
         $list = [];
         foreach ($words as $word) {

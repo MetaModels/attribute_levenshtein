@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
  * (c) 2012-2024 The MetaModels team.
  *
@@ -15,7 +15,7 @@
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2012-2024 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -43,9 +43,9 @@ class WordList
     /**
      * The SHA-1 checksum of the words.
      *
-     * @var string
+     * @var string|null
      */
-    private string $checksum;
+    private ?string $checksum = null;
 
     /**
      * Create a new instance.
@@ -66,7 +66,7 @@ class WordList
      */
     public function checksum()
     {
-        if (!isset($this->checksum)) {
+        if (null === $this->checksum) {
             $this->checksum = \sha1(\implode('', $this->words));
         }
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
  * (c) 2012-2024 The MetaModels team.
  *
@@ -15,7 +15,7 @@
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2012-2024 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -36,7 +36,7 @@ class Blacklist
     /**
      * The list of words.
      *
-     * @var array<string, string>
+     * @var array<string, array<lowercase-string, lowercase-string>>
      */
     private array $words = [];
 
@@ -95,15 +95,15 @@ class Blacklist
      *
      * @param WordList $list The list to filter.
      *
-     * @return array<string, string>
+     * @return array<string, int>
      */
     public function filter(WordList $list)
     {
         $language = $list->getLanguage();
         $words    = [];
-        foreach ($list->getWords() as $word) {
+        foreach ($list->getWords() as $word => $relevance) {
             if (!$this->matches($language, $word)) {
-                $words[] = $word;
+                $words[$word] = $relevance;
             }
         }
 

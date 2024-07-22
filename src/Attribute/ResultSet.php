@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
  * (c) 2012-2024 The MetaModels team.
  *
@@ -15,7 +15,7 @@
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2012-2024 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -33,21 +33,21 @@ class ResultSet
     /**
      * The list of results.
      *
-     * @var array[]
+     * @var array<string, array<string, list<string>>>
      */
     private array $results = [];
 
     /**
      * The list of results.
      *
-     * @var array[]
+     * @var array<string, array<string, list<string>>>
      */
     private array $mustResults = [];
 
     /**
      * The list of results tha must not be returned.
      *
-     * @var array[]
+     * @var array<string, array<string, list<string>>>
      */
     private array $negativeResults = [];
 
@@ -56,7 +56,7 @@ class ResultSet
      *
      * @param string            $searchExpression The expression that was searched.
      * @param IAttribute|string $attribute        The attribute that was searched.
-     * @param string[]          $results          The resulting ids.
+     * @param list<string>      $results          The resulting ids.
      *
      * @return void
      */
@@ -101,10 +101,6 @@ class ResultSet
      */
     public function addMustResult($searchExpression, $attributeId, $result)
     {
-        if (null === $this->mustResults) {
-            $this->mustResults = [];
-        }
-
         if (!isset($this->mustResults[$attributeId])) {
             $this->mustResults[$attributeId] = [];
         }
@@ -127,10 +123,6 @@ class ResultSet
      */
     public function addMustResults($searchExpression, $attributeId, $results)
     {
-        if (null === $this->mustResults) {
-            $this->mustResults = [];
-        }
-
         if (!isset($this->mustResults[$attributeId])) {
             $this->mustResults[$attributeId] = [];
         }
@@ -207,7 +199,7 @@ class ResultSet
 
         // add missing ids.
         if ($addMissingAttributes) {
-            $attributes = \array_unique(\array_merge($attributes, \array_keys($this->results)));
+            $attributes = \array_values(\array_unique(\array_merge($attributes, \array_keys($this->results))));
         }
 
         // determine the negative result set.
@@ -233,7 +225,7 @@ class ResultSet
      */
     public function hasResultsFor($word)
     {
-        $temp = new static();
+        $temp = new self();
 
         foreach ($this->results as $attribute => $attributeResults) {
             foreach ($attributeResults as $expression => $exprMatches) {
@@ -269,19 +261,19 @@ class ResultSet
     /**
      * Retrieve the mandatory ids as array.
      *
-     * @param string[] $attributeIds The list of attributes.
+     * @param list<string> $attributeIds The list of attributes.
      *
      * @return string[]|null
      */
     private function getMust(array $attributeIds): ?array
     {
-        if (\count($this->mustResults)) {
+        if ([] === $this->mustResults) {
             return null;
         }
 
         $must = [];
         foreach ($attributeIds as $attributeId) {
-            if (empty($this->mustResults[$attributeId])) {
+            if ([] === ($this->mustResults[$attributeId] ?? [])) {
                 continue;
             }
 
@@ -319,7 +311,7 @@ class ResultSet
         // determine the negative result set.
         $negatives = [];
         foreach ($attributeIds as $attributeId) {
-            if (empty($this->negativeResults[$attributeId])) {
+            if ([] === ($this->negativeResults[$attributeId] ?? [])) {
                 continue;
             }
 
@@ -344,7 +336,7 @@ class ResultSet
         $points    = [];
         $point     = $this->scoreMatrix($attributeIds);
         foreach ($attributeIds as $attributeId) {
-            if (empty($this->results[$attributeId])) {
+            if ([] === ($this->results[$attributeId] ?? [])) {
                 continue;
             }
 
@@ -371,7 +363,7 @@ class ResultSet
         }
 
         if (\count($positives) > 1) {
-            $results = \call_user_func_array(\array_values($positives), 'array_intersect');
+            $results = array_intersect(...\array_values($positives));
         }
 
         $results = \array_values(\array_unique($results));
