@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="src/Resources/translations/tl_metamodel_filtersetting.en.xlf">
+    <body>
+      <trans-unit id="typenames.levensthein" resname="typenames.levensthein">
+        <source>Levenshtein assisted search</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_autocomplete.label" resname="levenshtein_autocomplete.label">
+        <source>Activate autocomplete</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_autocomplete.description" resname="levenshtein_autocomplete.description">
+        <source>You can activate the autocomplete at search field - select the template for Levenshtein assisted search.</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_minChar.label" resname="levenshtein_minChar.label">
+        <source>Min. characters for autocomplete</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_minChar.description" resname="levenshtein_minChar.description">
+        <source>Number of characters from which the autocomplete should work.</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_autoSubmit.label" resname="levenshtein_autoSubmit.label">
+        <source>Submit form by autocomplete selection</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_autoSubmit.description" resname="levenshtein_autoSubmit.description">
+        <source>If the checkbox is activated, the form is sent when the autocomplete selection is clicked.</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

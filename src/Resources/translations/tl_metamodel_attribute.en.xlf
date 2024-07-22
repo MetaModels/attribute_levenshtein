@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="src/Resources/translations/tl_metamodel_attribute.en.xlf">
+    <body>
+      <trans-unit id="typeOptions.levensthein" resname="typeOptions.levensthein">
+        <source>Levenshtein assisted search</source>
+      </trans-unit>
+      <trans-unit id="levensthein_distance.label" resname="levensthein_distance.label">
+        <source>Maximum Levenshtein distance</source>
+      </trans-unit>
+      <trans-unit id="levensthein_distance.description" resname="levensthein_distance.description">
+        <source>Please select for each minimum word length, the maximum distance for the Levenshtein algorithm.</source>
+      </trans-unit>
+      <trans-unit id="levensthein_distance_wordlength.label" resname="levensthein_distance_wordlength.label">
+        <source>Minimum word length</source>
+      </trans-unit>
+      <trans-unit id="levensthein_distance_distance.label" resname="levensthein_distance_distance.label">
+        <source>Allowed distance</source>
+      </trans-unit>
+      <trans-unit id="levensthein_attributes.label" resname="levensthein_attributes.label">
+        <source>Attributes to index</source>
+      </trans-unit>
+      <trans-unit id="levensthein_attributes.description" resname="levensthein_attributes.description">
+        <source>Please select all attributes that shall get indexed.</source>
+      </trans-unit>
+      <trans-unit id="rebuild_levensthein.label" resname="rebuild_levensthein.label">
+        <source>Rebuild search index</source>
+      </trans-unit>
+      <trans-unit id="rebuild_levensthein.description" resname="rebuild_levensthein.description">
+        <source>Click to rebuild the search index.</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_minLengthWords.label" resname="levenshtein_minLengthWords.label">
+        <source>Minimum length of words</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_minLengthWords.description" resname="levenshtein_minLengthWords.description">
+        <source>Please select the minimum length of the words to be searched in the index.</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_maxLengthWords.label" resname="levenshtein_maxLengthWords.label">
+        <source>Maximum length of words</source>
+      </trans-unit>
+      <trans-unit id="levenshtein_maxLengthWords.description" resname="levenshtein_maxLengthWords.description">
+        <source>Please select the maximum length of the words to be searched in the index.</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
