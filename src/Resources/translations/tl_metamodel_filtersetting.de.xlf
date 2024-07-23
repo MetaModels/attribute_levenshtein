@@ -1,0 +1,34 @@
+<?xml version="1.0" ?><xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="src/Resources/translations/tl_metamodel_filtersetting.en.xlf" target-language="de">
+    <body>
+      <trans-unit id="typenames.levensthein" resname="typenames.levensthein">
+        <source>Levenshtein assisted search</source>
+        <target>Levenshtein-gestützte Suche</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_autocomplete.label" resname="levenshtein_autocomplete.label">
+        <source>Activate autocomplete</source>
+        <target>Automatische Vervollständigung</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_autocomplete.description" resname="levenshtein_autocomplete.description">
+        <source>You can activate the autocomplete at search field - select the template for Levenshtein assisted search.</source>
+        <target>Sie können die automatische Vervollständigung im Suchfeld aktivieren - wählen Sie die Vorlage für die Levenshtein-gestützte Suche.</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_minChar.label" resname="levenshtein_minChar.label">
+        <source>Min. characters for autocomplete</source>
+        <target>Min. Zeichen für die automatische Vervollständigung</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_minChar.description" resname="levenshtein_minChar.description">
+        <source>Number of characters from which the autocomplete should work.</source>
+        <target>Anzahl der Zeichen, ab denen die automatische Vervollständigung funktionieren soll.</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_autoSubmit.label" resname="levenshtein_autoSubmit.label">
+        <source>Submit form by autocomplete selection</source>
+        <target>Formular per automatischer Vervollständigung absenden</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_autoSubmit.description" resname="levenshtein_autoSubmit.description">
+        <source>If the checkbox is activated, the form is sent when the autocomplete selection is clicked.</source>
+        <target>Wenn das Kontrollkästchen aktiviert ist, wird das Formular gesendet, wenn die Auswahl für das automatische Ausfüllen angeklickt wird.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

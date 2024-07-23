@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -31,14 +31,16 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['levensthein extend
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_distance'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance'],
+    'label'       => 'levensthein_distance.label',
+    'description' => 'levensthein_distance.description',
     'exclude'   => true,
     'inputType' => 'multiColumnWizard',
     'eval'      => [
+        'useTranslator' => true,
         'disableSorting' => true,
         'columnFields'   => [
             'wordLength' => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance_wordlength'],
+                'label'       => 'levensthein_distance_wordlength.label',
                 'inputType' => 'text',
                 'default'   => '3',
                 'eval'      => [
@@ -47,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_distance'] =
                 ]
             ],
             'distance'   => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_distance_distance'],
+                'label'       => 'levensthein_distance_distance.label',
                 'inputType' => 'select',
                 'options'   => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 'default'   => '1',
@@ -65,7 +67,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_distance'] =
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_attributes'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levensthein_attributes'],
+    'label'       => 'levensthein_attributes.label',
+    'description' => 'levensthein_attributes.description',
     'exclude'   => true,
     'inputType' => 'checkboxWizard',
     'eval'      => ['multiple' => true, 'tl_class' => 'w50 w50x'],
@@ -73,13 +76,15 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_attributes']
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['list']['operations']['rebuild_levensthein'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['rebuild_levensthein'],
+    'label'       => 'rebuild_levensthein.label',
+    'description' => 'rebuild_levensthein.description',
     'href'  => 'act=rebuild_levensthein',
     'icon'  => 'bundles/metamodelsattributelevenshtein/levensthein.png'
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_minLengthWords'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_minLengthWords'],
+    'label'       => 'levenshtein_minLengthWords.label',
+    'description' => 'levenshtein_minLengthWords.description',
     'exclude'   => true,
     'inputType' => 'text',
     'default'   => '3',
@@ -91,7 +96,8 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_minLengthWor
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_maxLengthWords'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_metamodel_attribute']['levenshtein_maxLengthWords'],
+    'label'       => 'levenshtein_maxLengthWords.label',
+    'description' => 'levenshtein_maxLengthWords.description',
     'exclude'   => true,
     'inputType' => 'text',
     'default'   => '20',
