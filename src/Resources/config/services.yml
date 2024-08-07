@@ -14,7 +14,10 @@ services:
 
     # Backward compatibility.
     metamodels.attribute_levenshtein.filter_setting_renderer_listener:
-      deprecated: 'This service %alias_id% is deprecated since 2.2.0 and where removed in 3.0.'
+      deprecated:
+          package: metamodels/attribute_levenshtein
+          version: 2.2
+          message: 'This service %alias_id% is deprecated since 2.2.0 and where removed in 3.0.'
       alias: '@MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\FilterSetting\TypeRendererListener'
 
     MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\FilterSetting\TypeRendererListener:

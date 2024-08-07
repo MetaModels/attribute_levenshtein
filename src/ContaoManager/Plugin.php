@@ -28,6 +28,7 @@ use MetaModels\AttributeLevenshteinBundle\MetaModelsAttributeLevenshteinBundle;
 use MetaModels\CoreBundle\MetaModelsCoreBundle;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Contao Manager plugin.
@@ -37,7 +38,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     /**
      * {@inheritdoc}
      */
-    public function getBundles(ParserInterface $parser)
+    public function getBundles(ParserInterface $parser): array
     {
         return [
             BundleConfig::create(MetaModelsAttributeLevenshteinBundle::class)
@@ -53,7 +54,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
+    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel): ?RouteCollection
     {
         if (false === ($resolved = $resolver->resolve(__DIR__ . '/../Resources/config/routing.yml'))) {
             return null;
