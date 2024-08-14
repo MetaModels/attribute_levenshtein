@@ -93,7 +93,7 @@ class LevenshteinSearchSetting extends SimpleLookup
             return;
         }
 
-        $objFilter->addFilterRule(new StaticIdList([]));
+        $objFilter->addFilterRule(new StaticIdList(null));
     }
 
     /**
