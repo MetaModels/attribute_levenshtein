@@ -33,26 +33,30 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['levensthein extend
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_distance'] = [
     'label'       => 'levensthein_distance.label',
     'description' => 'levensthein_distance.description',
-    'exclude'   => true,
-    'inputType' => 'multiColumnWizard',
-    'eval'      => [
-        'useTranslator' => true,
+    'exclude'     => true,
+    'inputType'   => 'multiColumnWizard',
+    'eval'        => [
+        'useTranslator'  => true,
         'disableSorting' => true,
+        'default'        =>
+            [
+                ['wordLength' => 3, 'distance' => 1],
+                ['wordLength' => 5, 'distance' => 2],
+                ['wordLength' => 9, 'distance' => 5],
+            ],
         'columnFields'   => [
             'wordLength' => [
-                'label'       => 'levensthein_distance_wordlength.label',
+                'label'     => 'levensthein_distance_wordlength.label',
                 'inputType' => 'text',
-                'default'   => '3',
                 'eval'      => [
                     'rgxp'  => 'digit',
                     'style' => 'width:115px',
                 ]
             ],
             'distance'   => [
-                'label'       => 'levensthein_distance_distance.label',
+                'label'     => 'levensthein_distance_distance.label',
                 'inputType' => 'select',
                 'options'   => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                'default'   => '1',
                 'eval'      => [
                     'includeBlankOption' => true,
                     'style'              => 'width:115px',
@@ -69,41 +73,41 @@ $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_distance'] =
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levensthein_attributes'] = [
     'label'       => 'levensthein_attributes.label',
     'description' => 'levensthein_attributes.description',
-    'exclude'   => true,
-    'inputType' => 'checkboxWizard',
-    'eval'      => ['multiple' => true, 'tl_class' => 'w50 w50x'],
-    'sql'       => 'blob NULL',
+    'exclude'     => true,
+    'inputType'   => 'checkboxWizard',
+    'eval'        => ['multiple' => true, 'tl_class' => 'w50 w50x'],
+    'sql'         => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['list']['operations']['rebuild_levensthein'] = [
     'label'       => 'rebuild_levensthein.label',
     'description' => 'rebuild_levensthein.description',
-    'href'  => 'act=rebuild_levensthein',
-    'icon'  => 'bundles/metamodelsattributelevenshtein/levensthein.png'
+    'href'        => 'act=rebuild_levensthein',
+    'icon'        => 'bundles/metamodelsattributelevenshtein/levensthein.png'
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_minLengthWords'] = [
     'label'       => 'levenshtein_minLengthWords.label',
     'description' => 'levenshtein_minLengthWords.description',
-    'exclude'   => true,
-    'inputType' => 'text',
-    'default'   => '3',
-    'eval'      => [
+    'exclude'     => true,
+    'inputType'   => 'text',
+    'default'     => '3',
+    'eval'        => [
         'rgxp'     => 'digit',
         'tl_class' => 'clr w50',
     ],
-    'sql'       => "varchar(2) NOT NULL default '3'"
+    'sql'         => "varchar(2) NOT NULL default '3'"
 ];
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['levenshtein_maxLengthWords'] = [
     'label'       => 'levenshtein_maxLengthWords.label',
     'description' => 'levenshtein_maxLengthWords.description',
-    'exclude'   => true,
-    'inputType' => 'text',
-    'default'   => '20',
-    'eval'      => [
+    'exclude'     => true,
+    'inputType'   => 'text',
+    'default'     => '20',
+    'eval'        => [
         'rgxp'     => 'digit',
         'tl_class' => 'w50',
     ],
-    'sql'       => "varchar(3) NOT NULL default '20'"
+    'sql'         => "varchar(3) NOT NULL default '20'"
 ];
