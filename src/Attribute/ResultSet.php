@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,8 +13,9 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2024 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -23,39 +24,39 @@ namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 use MetaModels\Attribute\IAttribute;
 
 /**
- * This class implements an general purpose search result container.
+ * This class implements a general purpose search result container.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ResultSet
 {
     /**
      * The list of results.
      *
-     * @var array[]
+     * @var array<string, array<string, list<string>>>
      */
-    private $results = array();
+    private array $results = [];
 
     /**
      * The list of results.
      *
-     * @var array[]
+     * @var array<string, array<string, list<string>>>
      */
-    private $mustResults;
+    private array $mustResults = [];
 
     /**
      * The list of results tha must not be returned.
      *
-     * @var array[]
+     * @var array<string, array<string, list<string>>>
      */
-    private $negativeResults = array();
+    private array $negativeResults = [];
 
     /**
      * Add some results for a search expression on an attribute.
      *
      * @param string            $searchExpression The expression that was searched.
-     *
      * @param IAttribute|string $attribute        The attribute that was searched.
-     *
-     * @param string[]          $results          The resulting ids.
+     * @param list<string>      $results          The resulting ids.
      *
      * @return void
      */
@@ -71,9 +72,7 @@ class ResultSet
      * Add a single result match.
      *
      * @param string $searchExpression The search expression.
-     *
      * @param string $attributeId      The attribute id.
-     *
      * @param string $result           The matching id.
      *
      * @return void
@@ -81,11 +80,11 @@ class ResultSet
     public function addResult($searchExpression, $attributeId, $result)
     {
         if (!isset($this->results[$attributeId])) {
-            $this->results[$attributeId] = array();
+            $this->results[$attributeId] = [];
         }
 
         if (!isset($this->results[$attributeId][$searchExpression])) {
-            $this->results[$attributeId][$searchExpression] = array();
+            $this->results[$attributeId][$searchExpression] = [];
         }
 
         $this->results[$attributeId][$searchExpression][] = $result;
@@ -95,25 +94,19 @@ class ResultSet
      * Add a single result match.
      *
      * @param string $searchExpression The search expression.
-     *
      * @param string $attributeId      The attribute id.
-     *
      * @param string $result           The matching id.
      *
      * @return void
      */
     public function addMustResult($searchExpression, $attributeId, $result)
     {
-        if (null === $this->mustResults) {
-            $this->mustResults = array();
-        }
-
         if (!isset($this->mustResults[$attributeId])) {
-            $this->mustResults[$attributeId] = array();
+            $this->mustResults[$attributeId] = [];
         }
 
         if (!isset($this->mustResults[$attributeId][$searchExpression])) {
-            $this->mustResults[$attributeId][$searchExpression] = array();
+            $this->mustResults[$attributeId][$searchExpression] = [];
         }
 
         $this->mustResults[$attributeId][$searchExpression][] = $result;
@@ -123,25 +116,19 @@ class ResultSet
      * Add multiple result matches.
      *
      * @param string   $searchExpression The search expression.
-     *
      * @param string   $attributeId      The attribute id.
-     *
      * @param string[] $results          The resulting ids.
      *
      * @return void
      */
     public function addMustResults($searchExpression, $attributeId, $results)
     {
-        if (null === $this->mustResults) {
-            $this->mustResults = array();
-        }
-
         if (!isset($this->mustResults[$attributeId])) {
-            $this->mustResults[$attributeId] = array();
+            $this->mustResults[$attributeId] = [];
         }
 
         if (!isset($this->mustResults[$attributeId][$searchExpression])) {
-            $this->mustResults[$attributeId][$searchExpression] = array();
+            $this->mustResults[$attributeId][$searchExpression] = [];
         }
 
         foreach ($results as $result) {
@@ -153,9 +140,7 @@ class ResultSet
      * Add a single negative result match.
      *
      * @param string $searchExpression The search expression.
-     *
      * @param string $attributeId      The attribute id.
-     *
      * @param string $result           The matching id.
      *
      * @return void
@@ -163,11 +148,11 @@ class ResultSet
     public function addNegativeResult($searchExpression, $attributeId, $result)
     {
         if (!isset($this->negativeResults[$attributeId])) {
-            $this->negativeResults[$attributeId] = array();
+            $this->negativeResults[$attributeId] = [];
         }
 
         if (!isset($this->negativeResults[$attributeId][$searchExpression])) {
-            $this->negativeResults[$attributeId][$searchExpression] = array();
+            $this->negativeResults[$attributeId][$searchExpression] = [];
         }
 
         $this->negativeResults[$attributeId][$searchExpression][] = $result;
@@ -177,9 +162,7 @@ class ResultSet
      * Add multiple negative result matches.
      *
      * @param string   $searchExpression The search expression.
-     *
      * @param string   $attributeId      The attribute id.
-     *
      * @param string[] $results          The matching id.
      *
      * @return void
@@ -187,11 +170,11 @@ class ResultSet
     public function addNegativeResults($searchExpression, $attributeId, $results)
     {
         if (!isset($this->negativeResults[$attributeId])) {
-            $this->negativeResults[$attributeId] = array();
+            $this->negativeResults[$attributeId] = [];
         }
 
         if (!isset($this->negativeResults[$attributeId][$searchExpression])) {
-            $this->negativeResults[$attributeId][$searchExpression] = array();
+            $this->negativeResults[$attributeId][$searchExpression] = [];
         }
 
         foreach ($results as $result) {
@@ -203,33 +186,32 @@ class ResultSet
      * Retrieve the combined results.
      *
      * @param IAttribute[] $sortOrder            The attribute to sort the results by.
-     *
      * @param bool         $addMissingAttributes If true, missing attributes will be appended to the sort list.
      *
      * @return \string[]
      */
     public function getCombinedResults($sortOrder, $addMissingAttributes = true)
     {
-        $attributes = array();
+        $attributes = [];
         foreach ($sortOrder as $attribute) {
             $attributes[] = $attribute->get('id');
         }
 
         // add missing ids.
         if ($addMissingAttributes) {
-            $attributes = array_unique(array_merge($attributes, array_keys($this->results)));
+            $attributes = \array_values(\array_unique(\array_merge($attributes, \array_keys($this->results))));
         }
 
         // determine the negative result set.
         $negatives = $this->getNegatives($attributes);
 
-        $matches = array_diff($this->getPositives($attributes), $negatives);
+        $matches = \array_diff($this->getPositives($attributes), $negatives);
 
         if (null !== ($must = $this->getMust($attributes))) {
-            return array_values(array_intersect($matches, $must));
+            return \array_values(\array_intersect($matches, $must));
         }
 
-        return array_values($matches);
+        return \array_values($matches);
     }
 
     /**
@@ -243,7 +225,7 @@ class ResultSet
      */
     public function hasResultsFor($word)
     {
-        $temp = new static();
+        $temp = new self();
 
         foreach ($this->results as $attribute => $attributeResults) {
             foreach ($attributeResults as $expression => $exprMatches) {
@@ -254,7 +236,7 @@ class ResultSet
             }
         }
 
-        foreach ((array) $this->mustResults as $attribute => $attributeResults) {
+        foreach ($this->mustResults as $attribute => $attributeResults) {
             foreach ($attributeResults as $expression => $exprMatches) {
                 if ($expression === $word) {
                     $temp->addMustResults($expression, $attribute, $exprMatches);
@@ -273,48 +255,48 @@ class ResultSet
         }
 
         // Filtering because we have to kill any optional placeholder '0' in the results.
-        return array() !== array_filter($temp->getCombinedResults(array()));
+        return [] !== \array_filter($temp->getCombinedResults([]));
     }
 
     /**
      * Retrieve the mandatory ids as array.
      *
-     * @param string[] $attributeIds The list of attributes.
+     * @param list<string> $attributeIds The list of attributes.
      *
      * @return string[]|null
      */
-    private function getMust($attributeIds)
+    private function getMust(array $attributeIds): ?array
     {
-        if (null === $this->mustResults) {
+        if ([] === $this->mustResults) {
             return null;
         }
 
-        $must = array();
+        $must = [];
         foreach ($attributeIds as $attributeId) {
-            if (empty($this->mustResults[$attributeId])) {
+            if ([] === ($this->mustResults[$attributeId] ?? [])) {
                 continue;
             }
 
             foreach ($this->mustResults[$attributeId] as $expression => $exprMatches) {
                 if (!isset($must[$expression])) {
-                    $must[$expression] = array();
+                    $must[$expression] = [];
                 }
 
-                $must[$expression] = array_unique(array_merge($must[$expression], $exprMatches));
+                $must[$expression] = \array_unique(\array_merge($must[$expression], $exprMatches));
             }
         }
 
-        $results = current($must);
+        $results = \current($must);
 
         if (false === $results) {
-            return array();
+            return [];
         }
 
         foreach ($must as $result) {
-            $results = array_intersect($results, $result);
+            $results = \array_intersect($results, $result);
         }
 
-        return array_values(array_unique($results));
+        return \array_values(\array_unique($results));
     }
 
     /**
@@ -324,21 +306,21 @@ class ResultSet
      *
      * @return string[]
      */
-    private function getNegatives($attributeIds)
+    private function getNegatives(array $attributeIds): array
     {
         // determine the negative result set.
-        $negatives = array();
+        $negatives = [];
         foreach ($attributeIds as $attributeId) {
-            if (empty($this->negativeResults[$attributeId])) {
+            if ([] === ($this->negativeResults[$attributeId] ?? [])) {
                 continue;
             }
 
             foreach ($this->negativeResults[$attributeId] as $exprMatches) {
-                $negatives = array_merge($negatives, $exprMatches);
+                $negatives = \array_merge($negatives, $exprMatches);
             }
         }
 
-        return array_values(array_unique($negatives));
+        return \array_values(\array_unique($negatives));
     }
 
     /**
@@ -348,45 +330,48 @@ class ResultSet
      *
      * @return string[]
      */
-    private function getPositives($attributeIds)
+    private function getPositives(array $attributeIds): array
     {
-        $positives = array();
-        $points    = array();
+        $positives = [];
+        $points    = [];
         $point     = $this->scoreMatrix($attributeIds);
         foreach ($attributeIds as $attributeId) {
-            if (empty($this->results[$attributeId])) {
+            if ([] === ($this->results[$attributeId] ?? [])) {
                 continue;
             }
 
             foreach ($this->results[$attributeId] as $expression => $exprMatches) {
                 if (!isset($positives[$expression])) {
-                    $positives[$expression] = array();
+                    $positives[$expression] = [];
                 }
 
-                $positives[$expression] = array_unique(array_merge($positives[$expression], $exprMatches));
+                $positives[$expression] = \array_unique(array_merge($positives[$expression], $exprMatches));
 
                 foreach ($exprMatches as $match) {
+                    if (!\array_key_exists($match, $points)) {
+                        $points[$match] = $point[$attributeId];
+                    }
                     $points[$match] |= $point[$attributeId];
                 }
             }
         }
 
-        $results = current($positives);
+        $results = \current($positives);
 
         if (false === $results) {
-            return array();
+            return [];
         }
 
-        if (count($positives) > 1) {
-            $results = call_user_func_array('array_intersect', $positives);
+        if (\count($positives) > 1) {
+            $results = array_intersect(...\array_values($positives));
         }
 
-        $results = array_values(array_unique($results));
-        arsort($points);
+        $results = \array_values(\array_unique($results));
+        \arsort($points);
 
-        $results = array_intersect(array_keys($points), $results);
+        $results = \array_intersect(\array_keys($points), $results);
 
-        return array_values($results);
+        return \array_values($results);
     }
 
     /**
@@ -396,11 +381,11 @@ class ResultSet
      *
      * @return int[]
      */
-    private function scoreMatrix($attributeIds)
+    private function scoreMatrix(array $attributeIds): array
     {
-        $point = array();
+        $point = [];
 
-        foreach (array_values(array_reverse($attributeIds)) as $index => $id) {
+        foreach (\array_values(\array_reverse($attributeIds)) as $index => $id) {
             $point[$id] = (1 << $index);
         }
 

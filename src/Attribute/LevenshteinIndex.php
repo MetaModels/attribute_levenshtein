@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -23,7 +23,7 @@ namespace MetaModels\AttributeLevenshteinBundle\Attribute;
 
 use Doctrine\DBAL\Connection;
 use MetaModels\Attribute\IAttribute;
-use Patchwork\Utf8;
+use Symfony\Component\String\UnicodeString;
 
 /**
  * This class implements a general purpose search index for MetaModels to be searched with Levenshtein-Search algorithm.
@@ -64,7 +64,7 @@ class LevenshteinIndex
         $words     = $converter->process($text);
         $entry     = $this->lookUpEntry($attribute, $itemId, $language);
 
-        if (!count($entry)) {
+        if (!\count($entry)) {
             $entry = $this->createEntry($attribute, $itemId, $language, $words->checksum());
         } elseif ($words->checksum() === $entry['checksum']) {
             return;
@@ -98,7 +98,7 @@ class LevenshteinIndex
             ->setParameter('item', $itemId)
             ->setParameter('language', $language)
             ->setMaxResults(1)
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         if (count($entries)) {
@@ -134,7 +134,7 @@ class LevenshteinIndex
             ->setParameter('item', $itemId)
             ->setParameter('language', $language)
             ->setParameter('checksum', $checkSum)
-            ->execute();
+            ->executeQuery();
 
         return $this->lookUpEntry($attribute, $itemId, $language);
     }
@@ -156,7 +156,7 @@ class LevenshteinIndex
             ->delete('tl_metamodel_levensthein_index')
             ->where('tl_metamodel_levensthein_index.pid=:pid')
             ->setParameter('pid', $entry['id'])
-            ->execute();
+            ->executeQuery();
 
         if ($words->count() === 0) {
             return;
@@ -184,7 +184,7 @@ class LevenshteinIndex
                 ->setParameter('transliterated', $this->normalizeWord($word))
                 ->setParameter('relevance', $relevance)
                 ->setParameter('language', $words->getLanguage())
-                ->execute();
+                ->executeQuery();
         }
     }
 
@@ -197,10 +197,10 @@ class LevenshteinIndex
      */
     private function normalizeWord(string $word): string
     {
-        if (\mb_detect_encoding($word) == 'ASCII') {
+        if (\mb_detect_encoding($word) === 'ASCII') {
             return $word;
         }
 
-        return Utf8::toAscii($word);
+        return (new UnicodeString($word))->ascii()->toString();
     }
 }

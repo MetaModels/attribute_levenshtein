@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,7 @@
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -28,13 +28,20 @@ use ContaoCommunityAlliance\DcGeneral\Contao\RequestScopeDeterminator;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\AbstractEnvironmentAwareEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\ActionEvent;
+use ContaoCommunityAlliance\DcGeneral\InputProviderInterface;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use MetaModels\Attribute\IAttribute;
+use MetaModels\Helper\LocaleUtil;
 use MetaModels\IFactory;
+use MetaModels\IMetaModel;
 use MetaModels\ITranslatedMetaModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This provides the attribute name options.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class RegenerateSearchIndexListener extends AbstractListener
 {
@@ -80,9 +87,13 @@ class RegenerateSearchIndexListener extends AbstractListener
             return;
         }
 
-        $input     = $event->getEnvironment()->getInputProvider();
-        $metaModel = $this->getMetaModel(ModelId::fromSerialized($input->getParameter('pid'))->getId());
-        $attribute = $metaModel->getAttributeById(ModelId::fromSerialized($input->getParameter('id'))->getId());
+        $inputProvider = $event->getEnvironment()->getInputProvider();
+        assert($inputProvider instanceof InputProviderInterface);
+        $metaModel = $this->getMetaModel(ModelId::fromSerialized($inputProvider->getParameter('pid'))->getId());
+        assert($metaModel instanceof IMetaModel);
+        $attribute =
+            $metaModel->getAttributeById((int) ModelId::fromSerialized($inputProvider->getParameter('id'))->getId());
+        assert($attribute instanceof IAttribute);
 
         $entries = $this->connection
             ->createQueryBuilder()
@@ -90,46 +101,54 @@ class RegenerateSearchIndexListener extends AbstractListener
             ->from('tl_metamodel_levensthein', 't')
             ->where('t.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
-            ->execute()
-            ->fetchAll(\PDO::FETCH_COLUMN);
+            ->executeQuery()
+            ->fetchFirstColumn();
 
         $this->connection
             ->createQueryBuilder()
             ->delete('tl_metamodel_levensthein')
             ->where('tl_metamodel_levensthein.metamodel=:metamodel')
             ->setParameter('metamodel', $metaModel->get('id'))
-            ->execute();
+            ->executeQuery();
 
         if (!empty($entries)) {
             $this->connection
                 ->createQueryBuilder()
                 ->delete('tl_metamodel_levensthein_index')
                 ->where('tl_metamodel_levensthein_index.pid IN(:pids)')
-                ->setParameter('pids', $entries, Connection::PARAM_STR_ARRAY)
-                ->execute();
+                ->setParameter('pids', $entries, ArrayParameterType::STRING)
+                ->executeQuery();
         }
 
         if ($metaModel instanceof ITranslatedMetaModel) {
             $languageBackup = $metaModel->getLanguage();
             foreach ($metaModel->getLanguages() as $language) {
                 $metaModel->selectLanguage($language);
-                $GLOBALS['TL_LANGUAGE'] = $language;
+                // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
+                $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($language);
                 foreach ($metaModel->findByFilter(null) as $item) {
                     $attribute->modelSaved($item);
                 }
             }
             $metaModel->selectLanguage($languageBackup);
         } else {
+            // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
             $languageBackup = $GLOBALS['TL_LANGUAGE'];
-            $languages      = $metaModel->isTranslated(false)
+            /**
+             * @psalm-suppress DeprecatedMethod
+             * @psalm-suppress TooManyArguments
+             */
+            $languages = $metaModel->isTranslated(false)
                 ? $metaModel->getAvailableLanguages()
                 : [$languageBackup];
-            foreach ($languages as $language) {
-                $GLOBALS['TL_LANGUAGE'] = $language;
+            foreach ($languages ?? [] as $language) {
+                // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
+                $GLOBALS['TL_LANGUAGE'] = LocaleUtil::formatAsLanguageTag($language);
                 foreach ($metaModel->findByFilter(null) as $item) {
                     $attribute->modelSaved($item);
                 }
             }
+            // @deprecated usage of TL_LANGUAGE - remove for Contao 5.0.
             $GLOBALS['TL_LANGUAGE'] = $languageBackup;
         }
 
@@ -139,8 +158,8 @@ class RegenerateSearchIndexListener extends AbstractListener
             ->from('tl_metamodel_levensthein_index', 'tx')
             ->where('tx.pid IN (SELECT t.id FROM tl_metamodel_levensthein AS t WHERE t.metamodel=:metamodel)')
             ->setParameter('metamodel', $metaModel->get('id'))
-            ->execute()
-            ->fetch(\PDO::FETCH_COLUMN);
+            ->executeQuery()
+            ->fetchOne();
 
         $refererEvent = new GetReferrerEvent(true, 'tl_metamodel_attribute');
         $this->dispatcher->dispatch($refererEvent, ContaoEvents::SYSTEM_GET_REFERRER);
@@ -157,7 +176,7 @@ class RegenerateSearchIndexListener extends AbstractListener
 ',
                 $refererEvent->getReferrerUrl(),
                 $GLOBALS['TL_LANG']['MSC']['backBT'],
-                $count
+                (string) $count
             )
         );
     }

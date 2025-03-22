@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,14 +13,13 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2024 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MetaModels\AttributeLevenshteinBundle\Attribute;
-
-use Patchwork\Utf8;
 
 /**
  * This class represents a list of forbidden words.
@@ -30,29 +29,28 @@ class Blacklist
     /**
      * The language codes.
      *
-     * @var string
+     * @var array
      */
-    private $languages = array();
+    private array $languages = [];
 
     /**
      * The list of words.
      *
-     * @var array<string,string>
+     * @var array<string, array<lowercase-string, lowercase-string>>
      */
-    private $words = array();
+    private array $words = [];
 
     /**
      * Add a language to the blacklist.
      *
      * @param string $language The language code.
-     *
      * @param array  $list     The initial list of words.
      *
      * @return void
      *
      * @throws \InvalidArgumentException When the language has already been added.
      */
-    public function addLanguage($language, $list = array())
+    public function addLanguage($language, $list = [])
     {
         if ($this->hasLanguage($language)) {
             throw new \InvalidArgumentException('Language ' . $language . ' already registered.');
@@ -81,14 +79,13 @@ class Blacklist
      * Add a word to the given language.
      *
      * @param string $language The language code.
-     *
      * @param string $word     The word to add.
      *
      * @return void
      */
     public function addWord($language, $word)
     {
-        $word = Utf8::strtolower($word);
+        $word = \mb_strtolower($word);
 
         $this->words[$language][$word] = $word;
     }
@@ -98,15 +95,15 @@ class Blacklist
      *
      * @param WordList $list The list to filter.
      *
-     * @return array<string,int>
+     * @return array<string, int>
      */
     public function filter(WordList $list)
     {
         $language = $list->getLanguage();
-        $words    = array();
-        foreach ($list->getWords() as $word) {
+        $words    = [];
+        foreach ($list->getWords() as $word => $relevance) {
             if (!$this->matches($language, $word)) {
-                $words[] = $word;
+                $words[$word] = $relevance;
             }
         }
 
@@ -117,13 +114,12 @@ class Blacklist
      * Check if a certain word is blacklisted.
      *
      * @param string $language The language code.
-     *
      * @param string $word     The word to check.
      *
      * @return bool
      */
     public function matches($language, $word)
     {
-        return isset($this->words[$language][Utf8::strtolower($word)]);
+        return isset($this->words[$language][\mb_strtolower($word)]);
     }
 }

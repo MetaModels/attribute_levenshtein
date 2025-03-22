@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levensthein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,8 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -21,7 +22,10 @@
 namespace MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\Attribute;
 
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetOperationButtonEvent;
+use ContaoCommunityAlliance\DcGeneral\Data\ModelInterface;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\View\CommandInterface;
 use ContaoCommunityAlliance\DcGeneral\Event\AbstractEnvironmentAwareEvent;
+use MetaModels\IMetaModel;
 
 /**
  * This provides the attribute name options.
@@ -41,7 +45,10 @@ class OperationButtonListener extends AbstractListener
             return;
         }
 
-        if ('levensthein' !== $event->getModel()->getProperty('type')) {
+        $model = $event->getModel();
+        assert($model instanceof ModelInterface);
+
+        if ('levensthein' !== $model->getProperty('type')) {
             $event->setDisabled();
         }
     }
@@ -56,7 +63,10 @@ class OperationButtonListener extends AbstractListener
     protected function wantToHandle(AbstractEnvironmentAwareEvent $event)
     {
         /** @var GetOperationButtonEvent $event */
+        $command = $event->getCommand();
+        assert($command instanceof CommandInterface);
+
         return parent::wantToHandle($event)
-               && 'rebuild_levensthein' === $event->getCommand()->getName();
+               && 'rebuild_levensthein' === $command->getName();
     }
 }

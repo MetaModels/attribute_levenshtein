@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of MetaModels/attribute_levensthein.
+ * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2019 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,8 +13,9 @@
  * @package    MetaModels/attribute_levensthein
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
- * @copyright  2012-2019 The MetaModels team.
- * @license    https://github.com/MetaModels/attribute_levensthein/blob/master/LICENSE LGPL-3.0-or-later
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @copyright  2012-2024 The MetaModels team.
+ * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -30,33 +31,32 @@ class WordList
      *
      * @var string
      */
-    private $language;
+    private string $language;
 
     /**
      * The list of words.
      *
-     * @var array<string,int>
+     * @var array<string, int>
      */
-    private $words;
+    private array $words;
 
     /**
      * The SHA-1 checksum of the words.
      *
-     * @var string
+     * @var string|null
      */
-    private $checksum;
+    private ?string $checksum = null;
 
     /**
      * Create a new instance.
      *
-     * @param string            $language The language code.
-     *
-     * @param array<string,int> $words    The list of words (key is the word, value the relevance).
+     * @param string             $language The language code.
+     * @param array<string, int> $words    The list of words (key is the word, value the relevance).
      */
     public function __construct($language, $words)
     {
-        $this->language = (string) $language;
-        $this->words    = (array) $words;
+        $this->language = $language;
+        $this->words    = $words;
     }
 
     /**
@@ -66,8 +66,8 @@ class WordList
      */
     public function checksum()
     {
-        if (!isset($this->checksum)) {
-            $this->checksum = sha1(implode('', $this->words));
+        if (null === $this->checksum) {
+            $this->checksum = \sha1(\implode('', $this->words));
         }
 
         return $this->checksum;
@@ -76,7 +76,7 @@ class WordList
     /**
      * Retrieve the word list as associative array (key == word, value == relevance).
      *
-     * @return array<string,int>
+     * @return array<string, int>
      */
     public function getWords()
     {

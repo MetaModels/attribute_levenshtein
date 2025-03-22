@@ -1,0 +1,58 @@
+<?xml version="1.0" ?><xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" datatype="plaintext" original="src/Resources/translations/tl_metamodel_attribute.en.xlf" target-language="de">
+    <body>
+      <trans-unit id="typeOptions.levensthein" resname="typeOptions.levensthein">
+        <source>Levenshtein assisted search</source>
+        <target>Levenshtein-gestützte Suche</target>
+      </trans-unit>
+      <trans-unit id="levensthein_distance.label" resname="levensthein_distance.label">
+        <source>Maximum Levenshtein distance</source>
+        <target>Maximaler Levenshtein-Abstand</target>
+      </trans-unit>
+      <trans-unit id="levensthein_distance.description" resname="levensthein_distance.description">
+        <source>Please select for each minimum word length, the maximum distance for the Levenshtein algorithm.</source>
+        <target>Bitte wählen Sie für jede Mindestwortlänge den maximalen Abstand für den Levenshtein-Algorithmus.</target>
+      </trans-unit>
+      <trans-unit id="levensthein_distance_wordlength.label" resname="levensthein_distance_wordlength.label">
+        <source>Minimum word length</source>
+        <target>Minimale Wortlänge</target>
+      </trans-unit>
+      <trans-unit id="levensthein_distance_distance.label" resname="levensthein_distance_distance.label">
+        <source>Allowed distance</source>
+        <target>Erlaubter Abstand</target>
+      </trans-unit>
+      <trans-unit id="levensthein_attributes.label" resname="levensthein_attributes.label">
+        <source>Attributes to index</source>
+        <target>Attribute zum Indexieren</target>
+      </trans-unit>
+      <trans-unit id="levensthein_attributes.description" resname="levensthein_attributes.description">
+        <source>Please select all attributes that shall get indexed.</source>
+        <target>Bitte wählen Sie alle Attribute, die indexiert werden sollen.</target>
+      </trans-unit>
+      <trans-unit id="rebuild_levensthein.label" resname="rebuild_levensthein.label">
+        <source>Rebuild search index</source>
+        <target>Suchindex neu aufbauen</target>
+      </trans-unit>
+      <trans-unit id="rebuild_levensthein.description" resname="rebuild_levensthein.description">
+        <source>Click to rebuild the search index.</source>
+        <target>Bitte hier klicken, um den Suchindex neu aufzubauen.</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_minLengthWords.label" resname="levenshtein_minLengthWords.label">
+        <source>Minimum length of words</source>
+        <target>Mindestlänge der Wörter</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_minLengthWords.description" resname="levenshtein_minLengthWords.description">
+        <source>Please select the minimum length of the words to be searched in the index.</source>
+        <target>Bitte wählen Sie die Mindestlänge der Wörter aus, die im Index gesucht werden sollen.</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_maxLengthWords.label" resname="levenshtein_maxLengthWords.label">
+        <source>Maximum length of words</source>
+        <target>Maximale Länge der Wörter</target>
+      </trans-unit>
+      <trans-unit id="levenshtein_maxLengthWords.description" resname="levenshtein_maxLengthWords.description">
+        <source>Please select the maximum length of the words to be searched in the index.</source>
+        <target>Bitte wählen Sie die maximale Länge der Wörter aus, die im Index gesucht werden sollen.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

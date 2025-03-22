@@ -3,7 +3,7 @@
 /**
  * This file is part of MetaModels/attribute_levenshtein.
  *
- * (c) 2012-2022 The MetaModels team.
+ * (c) 2012-2024 The MetaModels team.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
  * @author     Ingolf Steinhardt <info@e-spin.de>
- * @copyright  2012-2022 The MetaModels team.
+ * @copyright  2012-2024 The MetaModels team.
  * @license    https://github.com/MetaModels/attribute_levenshtein/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -24,6 +24,7 @@ namespace MetaModels\AttributeLevenshteinBundle\EventListener\DcGeneral\Table\At
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\AbstractEnvironmentAwareEvent;
+use ContaoCommunityAlliance\DcGeneral\InputProviderInterface;
 use MetaModels\Attribute\IInternal;
 
 /**
@@ -44,12 +45,13 @@ class AttributeOptionsListener extends AbstractListener
             return;
         }
 
-        $model       = $event->getModel();
-        $metaModelId = $model->getProperty('pid');
+        $model         = $event->getModel();
+        $metaModelId   = $model->getProperty('pid');
+        $inputProvider = $event->getEnvironment()->getInputProvider();
+        assert($inputProvider instanceof InputProviderInterface);
+
         if (!$metaModelId) {
-            $metaModelId = ModelId::fromSerialized(
-                $event->getEnvironment()->getInputProvider()->getValue('pid')
-            )->getId();
+            $metaModelId = ModelId::fromSerialized($inputProvider->getValue('pid'))->getId();
         }
 
         $metaModel = $this->getMetaModel($metaModelId);
@@ -62,8 +64,10 @@ class AttributeOptionsListener extends AbstractListener
 
         // Fetch all attributes except for the current attribute and same type.
         foreach ($metaModel->getAttributes() as $attribute) {
-            if ($attribute->get('id') === $model->getId()
-                || $attribute->get('type') === $model->getProperty('type')) {
+            if (
+                $attribute->get('id') === $model->getId()
+                || $attribute->get('type') === $model->getProperty('type')
+            ) {
                 continue;
             }
 
@@ -93,11 +97,12 @@ class AttributeOptionsListener extends AbstractListener
     protected function wantToHandle(AbstractEnvironmentAwareEvent $event): bool
     {
         /** @var GetPropertyOptionsEvent $event */
-        $input = $event->getEnvironment()->getInputProvider();
+        $inputProvider = $event->getEnvironment()->getInputProvider();
+        assert($inputProvider instanceof InputProviderInterface);
         $type  = $event->getModel()->getProperty('type');
 
-        if ($input->hasValue('type')) {
-            $type = $input->getValue('type');
+        if ($inputProvider->hasValue('type')) {
+            $type = $inputProvider->getValue('type');
         }
 
         if (empty($type)) {
